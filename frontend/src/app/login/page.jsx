@@ -38,17 +38,14 @@ export default function LoginPage() {
 
       const emailUsuario = resposta.data.email || email;
 
-      if (emailUsuario.endsWith('@aluno.com')) {
-        router.push('/');
-      } else if (emailUsuario.endsWith('@gestao.com')) {
-        router.push('/noticias');
-      } else if (
-        emailUsuario.endsWith('@gremio.com') ||
-        emailUsuario.endsWith('@professor.com')
-      ) {
-        router.push('/');
+      if (emailUsuario.endsWith('@administrador.com')) {
+        router.push('/home1');
+
+      } else if (emailUsuario.endsWith('@tecnico.com')) {
+        router.push('/home2');
+  
       } else {
-        router.push('/');
+        router.push('/home3');
       }
 
     } catch (erro) {
@@ -76,6 +73,7 @@ export default function LoginPage() {
             <br></br>
             <h1 className="text-3xl font-bold text-center text-red-700 mb-3">
             ZELOS
+            <br></br><br></br>
             </h1>
             
             <p className="text-lg text-center text-gray-400">
@@ -88,7 +86,9 @@ export default function LoginPage() {
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
+                <br></br>
                 Email institucional
+                <br></br><br></br>
               </label>
               <div className="relative">
                 <input
@@ -113,11 +113,12 @@ export default function LoginPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Senha
+                <br></br><br></br>
               </label>
               <div className="relative">
                 <input
                   type={mostrarSenha ? "text" : "password"}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-700"
                   placeholder="••••••••"
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
@@ -146,11 +147,12 @@ export default function LoginPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Confirme sua senha
+                <br></br><br></br>
               </label>
               <div className="relative">
                 <input
                   type={mostrarConfirmSenha ? "text" : "password"}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-700"
                   placeholder="••••••••"
                   value={csenha}
                   onChange={(e) => setCsenha(e.target.value)}
@@ -198,7 +200,7 @@ export default function LoginPage() {
             <br></br>
             <div className="flex flex-col items-center space-y-3 text-sm">
               <button
-                onClick={() => router.push('/cadastro')}
+                onClick={() => router.push('/')}
                 className="text-red-800 hover:text-red-600 font-medium transition duration-200"
               >
                 Não tem conta? Cadastre-se aqui
@@ -210,6 +212,8 @@ export default function LoginPage() {
               >
                 Esqueceu sua senha?
               </button>
+              <br></br><br></br>
+
             </div>
           </div>
         </div>

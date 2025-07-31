@@ -1,128 +1,59 @@
 'use client';
 
-// Importações
 
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useRouter } from 'next/navigation';
-import Inputmask from 'inputmask';
+// Importaçãoes 
 
 
-// Funcionalidade (Confirmação de senha, Validação de email institucional)
+import axios from "axios";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default function Cadastro() {
-  const [cpf, setCpf] = useState('');
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-  const [csenha, setCsenha] = useState('');
-  const [cpfError, setCpfError] = useState('');
+
+
+// Funcionalidade (Verificação se email é institucional e confirmação/redefinição de senha) 
+
+export default function EsqueciSenha() {
+
+  const [email, setEmail] = useState("");
+  const [novaSenha, setNovaSenha] = useState("");
+  const [csenha, setCsenha] = useState("");
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [mostrarConfirmSenha, setMostrarConfirmSenha] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    // Aplica a máscara ao campo de CPF
-    const cpfInput = document.getElementById('cpf');
-    if (cpfInput) {
-      Inputmask({
-        mask: '999.999.999-99',
-        showMaskOnHover: false,
-      }).mask(cpfInput);
-    }
-  }, []);
-
-  // Função para validar CPF
-  const validarCPF = (cpf) => {
-    // Remove caracteres não numéricos
-    cpf = cpf.replace(/[^\d]/g, '');
-
-    // Verifica se tem 11 dígitos
-    if (cpf.length !== 11) {
-      return false;
-    }
-
-    // Verifica se todos os dígitos são iguais
-    if (/^(\d)\1+$/.test(cpf)) {
-      return false;
-    }
-
-    // Validação do primeiro dígito verificador
-    let soma = 0;
-    for (let i = 0; i < 9; i++) {
-      soma += parseInt(cpf.charAt(i)) * (10 - i);
-    }
-    let resto = 11 - (soma % 11);
-    let dv1 = resto > 9 ? 0 : resto;
-    if (dv1 !== parseInt(cpf.charAt(9))) {
-      return false;
-    }
-
-    // Validação do segundo dígito verificador
-    soma = 0;
-    for (let i = 0; i < 10; i++) {
-      soma += parseInt(cpf.charAt(i)) * (11 - i);
-    }
-    resto = 11 - (soma % 11);
-    let dv2 = resto > 9 ? 0 : resto;
-    if (dv2 !== parseInt(cpf.charAt(10))) {
-      return false;
-    }
-
-    return true;
-  };
-
-  const handleCPFChange = (e) => {
-    const value = e.target.value;
-    setCpf(value);
-    
-    // Limpa o erro se o campo estiver vazio
-    if (!value.trim()) {
-      setCpfError('');
-      return;
-    }
-
-    // Valida o CPF apenas se estiver completo
-    if (value.replace(/[^\d]/g, '').length === 11) {
-      if (!validarCPF(value)) {
-        setCpfError('CPF inválido');
-      } else {
-        setCpfError('');
-      }
-    }
-  };
-
-  const cadastrar = async (e) => {
+  const handleRedefinirSenha = async (e) => {
     e.preventDefault();
-
-    // Validações
-    if (cpfError) {
-      alert('Por favor, corrija o CPF antes de continuar.');
-      return;
-    }
-
-    if (!validarCPF(cpf)) {
-      alert('CPF inválido. Por favor, verifique.');
-      return;
-    }
-
-    if (senha !== csenha) {
+  
+    
+    if (csenha !== novaSenha) {
       alert('As senhas não coincidem.');
       return;
     }
-
+  
+ 
+    const dominiosPermitidos = ["@administrativosenai.com", "@tecnicosenai.com", "@alunosenai.com", "@professorsenai.com", "@funcionariosenai.com"];
+    const emailValido = dominiosPermitidos.some((dominio) => email.endsWith(dominio));
+  
+    if (!emailValido) {
+      alert("Apenas e-mails institucionais podem trocar de senha. Se você não tem um, por favor, entre em contato conosco.");
+      return;
+    }
+  
     try {
-      const res = await axios.post('http://localhost:3004/cadastro', {
-        cpf: cpf.replace(/[^\d]/g, ''), // Envia apenas os números
+     
+      const resposta = await axios.post("http://localhost:3004/esquecisenha", {
         email,
-        senha,
+        novaSenha,
       });
-      alert(res.data.mensagem);
-      router.push('/login');
+  
+      alert(resposta.data.mensagem || "Senha atualizada com sucesso!");
+      router.push("/login");
+  
     } catch (err) {
-      alert(err.response?.data?.erro || 'Erro no cadastro');
+      alert(err.response?.data?.mensagem || "Erro ao redefinir a senha.");
     }
   };
-
+  
 
   // Formulário
 
@@ -130,61 +61,29 @@ export default function Cadastro() {
     <div className="relative min-h-screen">
       <div
         className="absolute inset-0 bg-cover bg-center opacity-40 bg-no-repeat z-0"
-    
+       
       ></div>
 
       <div className="relative z-10 min-h-screen flex items-center justify-center py-12 px-4">
         <div className="w-full max-w-md bg-gray/95 backdrop-blur-sm rounded-2xl shadow-xl p-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-center text-red-700 mb-3">
-              <br></br>
-            Bem-vindo ao Zelos.
+              Recupere sua senha
             </h1>
-          
+            
+            <br></br>
             <p className="text-lg text-center text-gray-600">
-            Crie sua conta<br/>
-              <span className="font-semibold text-red-800">SENAI Armando de Arruda Pereira</span>
+              Digite seu email institucional para<br />
+              redefinir sua senha
             </p>
           </div>
 
-          <form className="space-y-6" onSubmit={cadastrar}>
+
+
+          <form className="space-y-6" onSubmit={handleRedefinirSenha}>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 <br></br>
-                CPF
-                <br></br><br></br>
-              </label>
-              <div className="relative">
-                <input
-                  id="cpf"
-                  type="text"
-                  className={`w-full px-4 py-3 border ${cpfError ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 ${cpfError ? 'focus:ring-red-500' : 'focus:ring-red-500'} focus:border-transparent text-gray-700`}
-                  placeholder="000.000.000-00"
-                  value={cpf}
-                  onChange={handleCPFChange}
-                  required
-                />
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                  {cpfError ? (
-                    <svg className="h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  ) : (
-                    <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-                    </svg>
-                  )}
-                </div>
-              </div>
-              {cpfError && (
-                <p className="mt-1 text-sm text-red-600">{cpfError}</p>
-              )}
-            </div>
-            <br></br>
-
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Email institucional
                 <br></br><br></br>
               </label>
@@ -204,12 +103,12 @@ export default function Cadastro() {
                 </div>
               </div>
             </div>
+
+
             <br></br>
-
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Senha
+                Nova senha
                 <br></br><br></br>
               </label>
               <div className="relative">
@@ -217,8 +116,8 @@ export default function Cadastro() {
                   type={mostrarSenha ? "text" : "password"}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-700"
                   placeholder="••••••••"
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
+                  value={novaSenha}
+                  onChange={(e) => setNovaSenha(e.target.value)}
                   required
                 />
                 <button
@@ -240,11 +139,10 @@ export default function Cadastro() {
               </div>
             </div>
 
-
-           <br></br>
+            <br></br>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Confirme sua senha
+                Confirme a nova senha
                 <br></br><br></br>
               </label>
               <div className="relative">
@@ -256,6 +154,8 @@ export default function Cadastro() {
                   onChange={(e) => setCsenha(e.target.value)}
                   required
                 />
+
+                
                 <button
                   type="button"
                   onClick={() => setMostrarConfirmSenha(!mostrarConfirmSenha)}
@@ -275,37 +175,33 @@ export default function Cadastro() {
               </div>
             </div>
 
-
             <br></br>
             <button
               type="submit"
               className="w-full bg-red-800 text-white py-3 rounded-lg hover:bg-red-600 transition duration-300 flex items-center justify-center space-x-2 font-medium"
             >
-              <span>Criar conta</span>
+              <span>Redefinir senha</span>
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
             </button>
           </form>
 
           <br></br>
-
           <div className="mt-8 space-y-4">
             <div className="flex items-center justify-center space-x-2">
               <span className="h-px flex-1 bg-gray-300"></span>
               <span className="text-sm text-gray-500 font-medium">ou</span>
               <span className="h-px flex-1 bg-gray-300"></span>
             </div>
+            <br></br>
             <div className="text-center">
-              <br></br>
               <button
                 onClick={() => router.push('/login')}
                 className="text-red-800 hover:text-red-600 font-medium transition duration-200"
               >
-                Já tem uma conta? Entre aqui
+                Voltar para o login
               </button>
-              <br></br><br></br>
-
             </div>
           </div>
         </div>
@@ -313,3 +209,6 @@ export default function Cadastro() {
     </div>
   );
 }
+
+
+  
