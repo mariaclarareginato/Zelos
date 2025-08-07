@@ -1,1 +1,7 @@
-[]
+[
+  {
+    "cpf": "12345678909",
+    "email": "teste@tecnico.com",
+    "senha": "111"
+  }
+]
