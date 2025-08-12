@@ -31,7 +31,7 @@ export default function EsqueciSenha() {
     }
   
  
-    const dominiosPermitidos = ["@administrativosenai.com", "@tecnicosenai.com", "@alunosenai.com", "@professorsenai.com", "@funcionariosenai.com"];
+    const dominiosPermitidos = ["@administrador..com", "@tecnico.com", "@senaisp.com"];
     const emailValido = dominiosPermitidos.some((dominio) => email.endsWith(dominio));
   
     if (!emailValido) {

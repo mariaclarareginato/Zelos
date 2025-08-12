@@ -117,6 +117,16 @@ INSERT INTO chamados (titulo, descricao, tipo_id, tecnico_id, usuario_id, status
    (5, 2, 'Instalação de nova impressora no setor do RH realizada', '2025-08-13 12:00', '2025-08-13 13:00'),
    (6, 1, 'Feita manutenção no cano do banheiro masculino', '2025-08-19 15:00', '2025-08-19 20:00'), 
    (7, 6, 'Manutenção do sistema interno realizada', '2025-08-15 16:30', '2025-08-15 18:15');
+
+   CREATE TABLE historico_chamados (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    chamado_id INT NOT NULL,
+    acao VARCHAR(255),
+    usuario_id INT,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (chamado_id) REFERENCES chamados(id)
+);
+
    
    -- Relacionar tecnico ao problema 
    INSERT INTO pool_tecnico (id_pool, id_tecnico) VALUES
