@@ -3,5 +3,10 @@
     "cpf": "12345678909",
     "email": "teste@tecnico.com",
     "senha": "111"
+  },
+  {
+    "cpf": "12345678909",
+    "email": "teste2@administrador.com",
+    "senha": "333"
   }
 ]
