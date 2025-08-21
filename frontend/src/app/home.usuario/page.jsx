@@ -57,7 +57,7 @@ export default function PainelUsuario() {
       <h1>Painel do Usuário</h1>
 
       <section>
-        <h2>📨 Criar novo chamado</h2>
+        <h2>📨 Abrir chamado: </h2>
         <form onSubmit={criarChamado}>
           <div>
             <label>

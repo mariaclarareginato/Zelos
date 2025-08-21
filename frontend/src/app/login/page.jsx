@@ -25,29 +25,23 @@ export default function LoginPage() {
     }
 
     try {
-      const resposta = await axios.post('http://localhost:3004/login', {
-        email,
-        senha,
-      });
-
-      alert(resposta.data.mensagem);
-
-      localStorage.setItem('usuarioAutenticado', JSON.stringify({
-        email: resposta.data.email
-      }));
-
-      const emailUsuario = resposta.data.email || email;
-
-      if (emailUsuario.endsWith('@administrador.com')) {
-        router.push('/home1');
-
-      } else if (emailUsuario.endsWith('@tecnico.com')) {
-        router.push('/home2');
-  
+      const resposta = await axios.post('http://localhost:3004/login', { email, senha });
+    
+      const { token, email: usuarioEmail } = resposta.data;
+    
+      // Salva token no localStorage
+      localStorage.setItem('token', token);
+    
+      // Redireciona baseado no email
+      if (usuarioEmail.endsWith('@administradorsenai.com')) {
+        router.push('/home.admin');
+      } else if (usuarioEmail.endsWith('@tecnicosenai.com')) {
+        router.push('/home.tecnico');
+      } else if (usuarioEmail.endsWith('@senaisp.com')) {
+        router.push('/home.usuario');
       } else {
-        router.push('/home3');
+        router.push('/home');
       }
-
     } catch (erro) {
       if (erro.response) {
         alert(erro.response.data.mensagem);
@@ -55,8 +49,8 @@ export default function LoginPage() {
         alert('Erro ao fazer login.');
       }
     }
-  };
-
+  }
+    
 
   // Formulário
 

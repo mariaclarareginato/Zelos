@@ -29,7 +29,7 @@ export default function Header() {
   };
 
   return (
-    <nav className="bg-red-900 text-gray-400">
+    <nav className="bg-red-950 text-gray-400">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20 flex-wrap">
           {/* Logo + Nome */}
@@ -39,7 +39,7 @@ export default function Header() {
               alt="Logo SENAI"
               className="h-10 w-auto object-contain"
             />
-            <p className="text-lg sm:text-2xl font-bold text-gray-400 leading-tight hover:text-gray-900">
+            <p className="text-lg sm:text-2xl font-bold text-gray-400 leading-tight hover:text-gray-500">
               Armando de Arruda Pereira
             </p>
           </div>
@@ -71,10 +71,10 @@ export default function Header() {
                 </button>
 
                 {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-40 bg-red-900 rounded-md shadow-lg z-10">
+                  <div className="absolute right-0 mt-2 w-40 bg-red-950 rounded-md shadow-lg z-10">
                     <button
                       onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2 text-gray-400 bg-red-900"
+                      className="block w-full text-left px-4 py-2 text-gray-400 bg-red-950"
                     >
                       Sair
                     </button>
@@ -85,13 +85,13 @@ export default function Header() {
               <>
                 <Link
                   href="/login"
-                  className="px-4 py-2 bg-red-900 rounded text-gray-400 font-bold"
+                  className="px-4 py-2 bg-red-950 rounded text-gray-400 font-bold"
                 >
                   Entrar
                 </Link>
                 <Link
                   href="/cadastro"
-                  className="px-4 py-2 bg-red-900 rounded text-gray-400 font-bold"
+                  className="px-4 py-2 bg-red-950 rounded text-gray-400 font-bold"
                 >
                   Cadastre-se
                 </Link>
@@ -135,7 +135,7 @@ export default function Header() {
               </div>
               <button
                 onClick={handleLogout}
-                className="block w-full bg-red-900 text-gray-400 font-bold py-2 rounded-md text-center"
+                className="block w-full bg-red-950 text-gray-400 font-bold py-2 rounded-md text-center"
               >
                 Sair
               </button>
@@ -144,14 +144,14 @@ export default function Header() {
             <>
               <Link
                 href="/login"
-                className="block w-full bg-red-900 text-gray-200 font-bold py-2 rounded-md text-center"
+                className="block w-full bg-red-950 text-gray-200 font-bold py-2 rounded-md text-center"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Entrar
               </Link>
               <Link
                 href="/cadastro"
-                className="block w-full bg-red-900 text-gray-200 font-bold py-2 rounded-md text-center"
+                className="block w-full bg-red-950 text-gray-200 font-bold py-2 rounded-md text-center"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Cadastre-se

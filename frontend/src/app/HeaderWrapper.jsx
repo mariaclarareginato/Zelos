@@ -20,9 +20,9 @@ export default function HeaderWrapper() {
   // Escondendo Header de todas as páginas menos essas
 
   const showLayout = (
-    pathname.startsWith("/home1") ||
-    pathname.startsWith("/home2") ||
-    pathname.startsWith("/home3")
+    pathname.startsWith("/home.admin") ||
+    pathname.startsWith("/home.tecnico") ||
+    pathname.startsWith("/home.usuario")
   );
 
 

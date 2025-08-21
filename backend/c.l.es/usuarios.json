@@ -1,69 +1,14 @@
 [
-  [
-    {
-      "cpf": "12345678909",
-      "email": "nicolas@administrador.com",
-      "senha": "123"
-    },
-    {
-      "cpf": "98765432100",
-      "email": "pedro@administrador.com",
-      "senha": "456"
-    },
-    {
-      "cpf": "11122233344",
-      "email": "sara@administrador.com",
-      "senha": "789"
-    },
-    {
-      "cpf": "55566677788",
-      "email": "felipe@administrador.com",
-      "senha": "001"
-    },
-    {
-      "cpf": "44455566677",
-      "email": "joao@tecnico.com",
-      "senha": "012"
-    },
-    {
-      "cpf": "22233344455",
-      "email": "fernando@tecnico.com",
-      "senha": "013"
-    },
-    {
-      "cpf": "33344455566",
-      "email": "ricardo@tecnico.com",
-      "senha": "014"
-    },
-    {
-      "cpf": "66677788899",
-      "email": "nicoli@tecnico.com",
-      "senha": "015"
-    },
-    {
-      "cpf": "77788899900",
-      "email": "carlos@senaisp.com",
-      "senha": "016"
-    },
-    {
-      "cpf": "88899900011",
-      "email": "bruno@senaisp.com",
-      "senha": "017"
-    },
-    {
-      "cpf": "99900011122",
-      "email": "gabi@senaisp.com",
-      "senha": "135"
-    },
-    {
-      "cpf": "00011122233",
-      "email": "pedro@senaisp.com",
-      "senha": "134"
-    }
-  ],
-  {
-    "cpf": "12345678909",
-    "email": "teste@tecnico.com",
-    "senha": "222"
-  }
+  {"cpf":"12345678909","email":"nicolas@administradorsenai.com","senha_hash":"$2b$12$LFaOrtNxBWEzdrfpuAcMH.EcjQif9B1uVBLz7wGvp2z7XO7/WIUQ."},
+  {"cpf":"98765432100","email":"pedro@administradorsenai.com","senha_hash":"$2b$12$6bTI/22YqRfGabMdd6qyuOb.gWrDvHzjVTcqhroFivJhqKYWJaCAS"},
+  {"cpf":"11122233344","email":"sara@administradorsenai.com","senha_hash":"$2b$12$l668PEnyQE8TJ1WutebiH.gWRj2gje8R1pXEJrDYNP7w5hWNaoJ9q"},
+  {"cpf":"55566677788","email":"felipe@administradorsenai.com","senha_hash":"$2b$12$aG.iiXXDIn4.1wgVf3nUuOGmSmH58PdUEe3RK2l6RH64xLjBToZvq"},
+  {"cpf":"44455566677","email":"joao@tecnicosenai.com","senha_hash":"$2b$12$4RvAjmhfSuTmgN76LBQViOq.QhAA91dh92g4y5dkqJ.82B9OsXtf2"},
+  {"cpf":"22233344455","email":"fernando@tecnicosenai.com","senha_hash":"$2b$12$c5wvfv3TzB9MxwY6q0eaMedEsmvXzwhZfU4AnclfkZPCUI2ioE7OW"},
+  {"cpf":"33344455566","email":"ricardo@tecnicosenai.com","senha_hash":"$2b$12$rJ7/h6ZYlhWM6REu1C0yYuLHyDklBL2CQFRspFxBnWVAKvbDTRFXC"},
+  {"cpf":"66677788899","email":"nicoli@tecnicosenai.com","senha_hash":"$2b$12$R0NkA0zz.fokCxG35q2I6uNXqqpX0l26oc/ItXXOK5U0BVCC9CycS"},
+  {"cpf":"77788899900","email":"carlos@senaisp.com","senha_hash":"$2b$12$R6KjcGkfGa5tmCgaJMGnruTrWXPypN6o9ZZnZYkqWyA.GcF/LDwka"},
+  {"cpf":"88899900011","email":"bruno@senaisp.com","senha_hash":"$2b$12$faqtkAR2dSgfjYiKXKg4Ue1HKWiDJUVmDLaW1xtN6PIzklYiZaSke"},
+  {"cpf":"99900011122","email":"gabi@senaisp.com","senha_hash":"$2b$12$.D7ZzDk4ZJaXjf.5Oxmyg.0gRMpsJSRVeuLcwbef.kPI3ZvFTS0Vm"},
+  {"cpf":"00011122233","email":"pedro@senaisp.com","senha_hash":"$2b$12$zpcpVfzmc0gmKmTO/FaMNueDUXGDeuK3UHEI8vOyfG2VNb3AbD5li"}
 ]
