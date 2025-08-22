@@ -38,12 +38,14 @@ export default function HomeTecnico() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold">Painel do Técnico</h1>
+      <br></br>
+      <h1 className="text-center text-3xl font-bold mt-20 text-gray-400">Painel do Técnico</h1>
 
       {/* Chamados disponíveis */}
-      <h2 className="text-xl mt-4">📋 Chamados disponíveis</h2>
+      <br></br>
+      <h2 className="text-xl mt-4 text-center text-gray-400">Chamados disponíveis: </h2>
       {disponiveis.length === 0 ? (
-        <p>Nenhum chamado disponível.</p>
+        <p className="text-center text-red-400">Nenhum chamado disponível.</p>
       ) : (
         disponiveis.map((c) => (
           <div key={c.id} className="border p-3 rounded mb-2">
@@ -51,7 +53,7 @@ export default function HomeTecnico() {
             <p>{c.descricao}</p>
             <button
               onClick={() => assumirChamado(c.id)}
-              className="bg-blue-500 text-white px-3 py-1 rounded mt-2"
+              className="bg-red-900 text-gray-300 px-3 py-1 rounded mt-2"
             >
               Assumir
             </button>
@@ -60,17 +62,20 @@ export default function HomeTecnico() {
       )}
 
       {/* Meus chamados */}
-      <h2 className="text-xl mt-6">🛠️ Meus chamados</h2>
+
+      <br></br><br></br>
+      <h2 className="text-xl mt-6 text-center text-gray-400">Meus chamados</h2>
       {meusChamados.length === 0 ? (
-        <p>Você não tem chamados em andamento.</p>
+        <p className="text-center text-red-400">Você não tem chamados em andamento.</p>
       ) : (
         meusChamados.map((c) => (
           <div key={c.id} className="border p-3 rounded mb-2">
             <h3 className="font-semibold">{c.titulo} ({c.status})</h3>
             <p>{c.descricao}</p>
+
             <button
               onClick={() => criarApontamento(c.id)}
-              className="bg-green-500 text-white px-3 py-1 rounded mt-2"
+              className="bg-red-900 text-gray-400 px-3 py-1 rounded mt-2"
             >
               Criar Apontamento
             </button>

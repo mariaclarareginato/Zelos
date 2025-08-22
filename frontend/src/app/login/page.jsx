@@ -79,7 +79,7 @@ export default function LoginPage() {
 
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-450 mb-1">
                 <br></br>
                 Email institucional
                 <br></br><br></br>
@@ -87,7 +87,7 @@ export default function LoginPage() {
               <div className="relative">
                 <input
                   type="email"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-700"
+                  className="w-full px-4 py-3 border border-gray-450 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-450 text-center"
                   placeholder="seu.email@dominio.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -103,16 +103,21 @@ export default function LoginPage() {
               </div>
             </div>
 
+
+
+
+
+
               <br></br>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-450 mb-1">
                 Senha
                 <br></br><br></br>
               </label>
               <div className="relative">
                 <input
                   type={mostrarSenha ? "text" : "password"}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-700"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-450 text-center"
                   placeholder="••••••••"
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
@@ -137,16 +142,21 @@ export default function LoginPage() {
               </div>
             </div>
                
+
+
+
+
+
             <br></br>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-450 mb-1">
                 Confirme sua senha
                 <br></br><br></br>
               </label>
               <div className="relative">
                 <input
                   type={mostrarConfirmSenha ? "text" : "password"}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-700"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-450 text-center"
                   placeholder="••••••••"
                   value={csenha}
                   onChange={(e) => setCsenha(e.target.value)}
@@ -175,7 +185,7 @@ export default function LoginPage() {
            <br></br>
             <button
               type="submit"
-              className="w-full bg-red-800 text-white py-3 rounded-lg hover:bg-red-600 transition duration-300 flex items-center justify-center space-x-2 font-medium"
+              className="w-full bg-red-1000 text-gray-400 py-3 rounded-lg hover:bg-red-900 transition duration-300 flex items-center justify-center space-x-2 font-medium"
             >
               <span>Entrar</span>
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -192,6 +202,7 @@ export default function LoginPage() {
               <span className="h-px flex-1 bg-gray-300"></span>
             </div>
             <br></br>
+            
             <div className="flex flex-col items-center space-y-3 text-sm">
               <button
                 onClick={() => router.push('/')}
@@ -199,6 +210,7 @@ export default function LoginPage() {
               >
                 Não tem conta? Cadastre-se aqui
               </button>
+
               <br></br>
               <button
                 onClick={() => router.push('/esquecisenha')}

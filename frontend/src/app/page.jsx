@@ -83,19 +83,20 @@ export default function Cadastro() {
             <h1 className="text-3xl font-bold text-center text-red-700 mb-3">
               Bem-vindo ao Zelos.
             </h1>
-            <p className="text-lg text-center text-gray-600">
+            <p className="text-lg text-center text-gray-500">
               Crie conta <span className="font-semibold text-red-800">SENAI Armando de Arruda Pereira</span>
             </p>
           </div>
+          <br></br>
 
           <form className="space-y-6" onSubmit={cadastrar}>
             {/* CPF */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">CPF</label>
+              <label className="block text-sm font-medium text-gray-450 mb-1">CPF</label>
               <input
                 id="cpf"
                 type="text"
-                className={`w-full px-4 py-3 border ${cpfError ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 ${cpfError ? 'focus:ring-red-500' : 'focus:ring-red-500'} text-gray-700`}
+                className={`w-full px-4 py-3 border ${cpfError ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 ${cpfError ? 'focus:ring-red-500' : 'focus:ring-red-500'} text-gray-450 text-center`}
                 placeholder="000.000.000-00"
                 value={cpf}
                 onChange={handleCPFChange}
@@ -104,12 +105,14 @@ export default function Cadastro() {
               {cpfError && <p className="mt-1 text-sm text-red-600">{cpfError}</p>}
             </div>
 
+            <br></br>
+
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email institucional</label>
+              <label className="block text-sm font-medium text-gray-450 mb-1">Email institucional</label>
               <input
                 type="email"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-700"
+                className="w-full px-4 py-3 border border-gray-450 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-450 text-center"
                 placeholder="seu.email@dominio.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -117,12 +120,14 @@ export default function Cadastro() {
               />
             </div>
 
+            <br></br>
+
             {/* Senha */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+              <label className="block text-sm font-medium text-gray-450 mb-1">Senha</label>
               <input
                 type={mostrarSenha ? 'text' : 'password'}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-700"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-450 text-center"
                 placeholder="••••••••"
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
@@ -131,12 +136,14 @@ export default function Cadastro() {
               <button type="button" onClick={() => setMostrarSenha(!mostrarSenha)}>👁️</button>
             </div>
 
+            <br></br>
+
             {/* Confirmar Senha */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Confirme sua senha</label>
+              <label className="block text-sm font-medium text-gray-450 mb-1">Confirme sua senha</label>
               <input
                 type={mostrarConfirmSenha ? 'text' : 'password'}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-700"
+                className="w-full px-4 py-3 border border-gray-450 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-450 text-center"
                 placeholder="••••••••"
                 value={csenha}
                 onChange={(e) => setCsenha(e.target.value)}
@@ -145,22 +152,44 @@ export default function Cadastro() {
               <button type="button" onClick={() => setMostrarConfirmSenha(!mostrarConfirmSenha)}>👁️</button>
             </div>
 
+            <br></br>
+
             {/* Código Admin */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Código de Administrador</label>
+              <label className="block text-sm font-medium text-gray-450 mb-1">Código de Administrador</label>
               <input
                 type="text"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-700"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-450 text-center"
                 placeholder="Digite o código fornecido"
                 value={codigoAdmin}
                 onChange={(e) => setCodigoAdmin(e.target.value)}
                 required
               />
             </div>
+            <br></br><br></br>
 
-            <button type="submit" className="w-full bg-red-800 text-white py-3 rounded-lg hover:bg-red-600 transition duration-300">
-              Criar conta
+            <button
+              type="submit"
+              className="w-full bg-red-1000 text-gray-400 py-3 rounded-lg hover:bg-red-900 transition duration-300 flex items-center justify-center space-x-2 font-medium"
+            >
+              <span>Criar conta</span>
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
             </button>
+
+            <br></br>
+
+            <div className="flex flex-col items-center space-y-3 text-sm">
+              <button
+                onClick={() => router.push('/login')}
+                className="text-red-600 hover:text-red-700 text-center transition duration-200 "
+              >
+                Voltar para a página de login
+              </button>
+              </div>
+
+              <br></br><br></br>
           </form>
         </div>
       </div>

@@ -54,49 +54,85 @@ export default function PainelUsuario() {
 
   return (
     <main style={{ padding: 20 }}>
-      <h1>Painel do Usuário</h1>
+      <h1 className="text-center text-3xl font-bold mt-20 text-gray-400">Painel do Usuário</h1>
 
+<br></br>
       <section>
-        <h2>📨 Abrir chamado: </h2>
+        <h2 className="text-xl mt-4 text-center text-gray-400" >Abrir chamado: </h2>
+       
+       
         <form onSubmit={criarChamado}>
           <div>
-            <label>
+            <label >
               Título:{" "}
+
               <input
                 type="text"
                 value={titulo}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-450 text-center"
                 onChange={(e) => setTitulo(e.target.value)}
               />
             </label>
           </div>
+
+
+          <br></br>
           <div>
             <label>
               Descrição:{" "}
               <textarea
                 value={descricao}
+                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-450 text-center"
                 onChange={(e) => setDescricao(e.target.value)}
               />
             </label>
           </div>
+
+
+
+<br></br>
           <div>
             <label>
-              Tipo (id):{" "}
+              (ID):{" "}
               <input
                 type="number"
                 value={tipoId}
+                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-450 text-center"
                 onChange={(e) => setTipoId(e.target.value)}
                 min="1"
               />
             </label>
           </div>
-          <button type="submit">Criar Chamado</button>
+
+
+
+          <br></br>
+
+          <div className="flex flex-col items-center space-y-3 text-sm border border-red-900 rounded-md p-3 hover:border-red-600">
+  <button 
+    type="submit"
+    className="inline-block text-red-800 hover:text-red-600 font-medium transition duration-200"
+  >
+    Criar Chamado +
+  </button>
+</div>
+<br></br>
+
+
+
         </form>
+
         {mensagem && <p>{mensagem}</p>}
+
       </section>
 
+
+
+      <br></br><br></br><br></br>
+
       <section>
-        <h2>🔍 Meus Chamados</h2>
-        {meusChamados.length === 0 && <p>Você não tem chamados.</p>}
+        <h2 className="text-xl mt-4 text-center text-gray-400">Meus Chamados</h2>
+        {meusChamados.length === 0 && <p className="text-center text-red-400" >Você não tem chamados.</p>}
         <ul>
           {meusChamados.map((chamado) => (
             <li key={chamado.id}>

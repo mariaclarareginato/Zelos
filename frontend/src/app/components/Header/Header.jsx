@@ -11,8 +11,10 @@ export default function Header() {
   const router = useRouter();
 
   useEffect(() => {
-    const dados = JSON.parse(localStorage.getItem("usuarioAutenticado"));
-    setUsuarioAutenticado(dados);
+    const dados = localStorage.getItem("usuarioAutenticado");
+    if (dados) {
+      setUsuarioAutenticado(JSON.parse(dados));
+    }
   }, []);
 
   const handleLogout = () => {
@@ -24,8 +26,11 @@ export default function Header() {
   };
 
   const getNomeUsuario = () => {
-    if (!usuarioAutenticado?.email) return "";
-    return usuarioAutenticado.email.split("@")[0];
+    if (!usuarioAutenticado) return "";
+    // Se tiver nome vindo do backend, use aqui:
+    if (usuarioAutenticado.nome) return usuarioAutenticado.nome;
+    // Caso contrário, mostra só o prefixo do e-mail
+    return usuarioAutenticado.email?.split("@")[0] || "";
   };
 
   return (
@@ -35,7 +40,7 @@ export default function Header() {
           {/* Logo + Nome */}
           <div className="flex items-center gap-4">
             <img
-              src="/logo.png"
+              src="imgs//logo.png"
               alt="Logo SENAI"
               className="h-10 w-auto object-contain"
             />
@@ -90,7 +95,7 @@ export default function Header() {
                   Entrar
                 </Link>
                 <Link
-                  href="/cadastro"
+                  href="/" // aqui corrigi, antes era /cadastro
                   className="px-4 py-2 bg-red-950 rounded text-gray-400 font-bold"
                 >
                   Cadastre-se
@@ -150,7 +155,7 @@ export default function Header() {
                 Entrar
               </Link>
               <Link
-                href="/cadastro"
+                href="/" // corrigido aqui também
                 className="block w-full bg-red-950 text-gray-200 font-bold py-2 rounded-md text-center"
                 onClick={() => setIsMobileMenuOpen(false)}
               >

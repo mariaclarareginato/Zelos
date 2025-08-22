@@ -72,7 +72,7 @@ export default function EsqueciSenha() {
             </h1>
             
             <br></br>
-            <p className="text-lg text-center text-gray-600">
+            <p className="text-lg text-center text-gray-400">
               Digite seu email institucional para<br />
               redefinir sua senha
             </p>
@@ -82,7 +82,7 @@ export default function EsqueciSenha() {
 
           <form className="space-y-6" onSubmit={handleRedefinirSenha}>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-450 mb-1">
                 <br></br>
                 Email institucional
                 <br></br><br></br>
@@ -90,7 +90,7 @@ export default function EsqueciSenha() {
               <div className="relative">
                 <input
                   type="email"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-700"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-450 text-center"
                   placeholder="seu.email@dominio.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -105,16 +105,17 @@ export default function EsqueciSenha() {
             </div>
 
 
+
             <br></br>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-450 mb-1">
                 Nova senha
                 <br></br><br></br>
               </label>
               <div className="relative">
                 <input
                   type={mostrarSenha ? "text" : "password"}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-700"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-450 text-center"
                   placeholder="••••••••"
                   value={novaSenha}
                   onChange={(e) => setNovaSenha(e.target.value)}
@@ -139,16 +140,19 @@ export default function EsqueciSenha() {
               </div>
             </div>
 
+
+
+
             <br></br>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-450 mb-1">
                 Confirme a nova senha
                 <br></br><br></br>
               </label>
               <div className="relative">
                 <input
                   type={mostrarConfirmSenha ? "text" : "password"}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-700"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-450 text-center"
                   placeholder="••••••••"
                   value={csenha}
                   onChange={(e) => setCsenha(e.target.value)}
@@ -178,7 +182,7 @@ export default function EsqueciSenha() {
             <br></br>
             <button
               type="submit"
-              className="w-full bg-red-800 text-white py-3 rounded-lg hover:bg-red-600 transition duration-300 flex items-center justify-center space-x-2 font-medium"
+              className="w-full bg-red-1000 text-gray-400 py-3 rounded-lg hover:bg-red-900 transition duration-300 flex items-center justify-center space-x-2 font-medium"
             >
               <span>Redefinir senha</span>
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

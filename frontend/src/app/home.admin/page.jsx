@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import {jwtDecode} from "jwt-decode"; // ✅ Import correto
+import {jwtDecode} from "jwt-decode"; 
 
 export default function HomeAdmin() {
   const [chamados, setChamados] = useState([]);
@@ -109,6 +109,7 @@ export default function HomeAdmin() {
   }
 
   // ✅ Fechar chamado
+
   async function fecharChamado() {
     if (!selectedChamadoId) return;
     try {
@@ -128,15 +129,15 @@ export default function HomeAdmin() {
   }
 
   return (
-    <main className="p-6 bg-gray-900 min-h-screen">
+    <main className="p-6 bg-black min-h-screen">
       <br></br>
-      <h1 className="text-3xl font-bold mt-20 text-center text-gray-300">Painel do Administrador</h1>
+      <h1 className="text-3xl font-bold mt-20 text-center text-gray-400">Painel do Administrador</h1>
 
       <br></br>
 
       <section className="flex justify-center mb-6 mt-6">
         <select
-          className="text-center border rounded p-2 w-full max-w-md"
+          className="text-center border rounded p-2 w-full max-w-md text-gray-400"
           value={selectedChamadoId}
           onChange={(e) => setSelectedChamadoId(e.target.value)}
         >
@@ -197,14 +198,14 @@ export default function HomeAdmin() {
               Atualizar
             </button>
             <button
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+              className="bg-red-900 text-gray-400 px-4 py-2 rounded hover:bg-red-700"
               onClick={fecharChamado}
             >
               Fechar Chamado
             </button>
           </div>
 
-          {message && <p className="mt-2 text-sm text-gray-700">{message}</p>}
+          {message && <p className="mt-2 text-sm text-red-800">{message}</p>}
 
           <div className="mt-4">
             <h3 className="font-semibold mb-2">Histórico</h3>
@@ -214,6 +215,10 @@ export default function HomeAdmin() {
           </div>
         </section>
       )}
+
+
+
+      <br></br><br></br>
 
       <section className="text-center p-4 rounded shadow text-red-700 mt-6">
         <br></br>

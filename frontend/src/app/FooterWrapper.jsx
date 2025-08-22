@@ -1,12 +1,10 @@
 "use client";
 
-
-
 import { usePathname } from "next/navigation";
-import Header from "./components/Header/Header.jsx";
+import Footer from './components/Footer/Footer.jsx';
 import { useState, useEffect } from "react";
 
-export default function HeaderWrapper() {
+export default function FooterWrapper() {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
 
@@ -28,9 +26,10 @@ export default function HeaderWrapper() {
     pathname.startsWith("/termosdeuso") 
   );
 
+ 
 
-
-  return showLayout ? <Header /> : null;
+  return showLayout ? <Footer/> : null; 
+ 
 
 
 }

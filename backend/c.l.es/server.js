@@ -81,3 +81,20 @@ const PORT = 3004;
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
+
+
+
+
+
+// ('Nicolas de Lima', 123, 'nicolas@administradorsenai.com', 'Administrador', 'ativo'),
+// ('Pedro Vasconcelos', 456, 'pedro@administradorsenai.com', 'Administrador', 'ativo'), 
+//('Sara Limeira', 789, 'sara@administradorsenai.com', 'Administrador', 'inativo'), 
+//('Felipe Casaquera', 001, 'felipe@administradorsenai.com', 'Administrador', 'inativo'), 
+//('João Carvalho', 012, 'joao@tecnicosenai.com', 'Técnico', 'ativo'), 
+//('Fernando Manhasi', 013, 'fernando@tecnicosenai.com', 'Técnico', 'ativo'), 
+//('Ricardo Espanha', 014, 'ricardo@tecnicosenai.com', 'Técnico', 'ativo'), 
+//('Nicoli Castilho', 015, 'nicoli@tecnicosenai.com', 'Técnico', 'inativo'), 
+//('Carlos Ferreira', 016, 'carlos@senaisp.com', 'Usuário', 'ativo'), 
+//('Bruno Leite Farias', 017, 'bruno@senaisp.com', 'Usuário', 'ativo'), 
+//('Gabriele Oliveira', 135, 'gabi@senaisp.com', 'Usuário', 'inativo'), 
+//('Pedro Camões', 134, 'pedro@senaisp.com', 'Usuário', 'inativo');

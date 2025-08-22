@@ -2,6 +2,7 @@
 
 import "./globals.css";
 import HeaderWrapper from "./HeaderWrapper";
+import FooterWrapper from "./FooterWrapper";
 
 export const metadata = {
   title: "SENAI Armando de Arruda Pereira",
@@ -14,6 +15,7 @@ export default function RootLayout({ children }) {
       <body>
         <HeaderWrapper />
         {children}
+        <FooterWrapper />
       </body>
     </html>
   );
