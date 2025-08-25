@@ -4,6 +4,8 @@ import db from "../db.js";
 const router = express.Router();
 
 // Listar todos chamados com nome do técnico
+
+
 router.get("/", (req, res) => {
   const query = `
     SELECT c.id, c.titulo, c.status, u.nome AS tecnico

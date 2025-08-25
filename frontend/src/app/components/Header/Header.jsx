@@ -89,13 +89,13 @@ export default function Header() {
             ) : (
               <>
                 <Link
-                  href="/login"
+                  href="/"
                   className="px-4 py-2 bg-red-950 rounded text-gray-400 font-bold"
                 >
                   Entrar
                 </Link>
                 <Link
-                  href="/" // aqui corrigi, antes era /cadastro
+                  href="/cadastro" // aqui corrigi, antes era /cadastro
                   className="px-4 py-2 bg-red-950 rounded text-gray-400 font-bold"
                 >
                   Cadastre-se
@@ -148,14 +148,14 @@ export default function Header() {
           ) : (
             <>
               <Link
-                href="/login"
+                href="/"
                 className="block w-full bg-red-950 text-gray-200 font-bold py-2 rounded-md text-center"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Entrar
               </Link>
               <Link
-                href="/" // corrigido aqui também
+                href="/cadastro" // corrigido aqui também
                 className="block w-full bg-red-950 text-gray-200 font-bold py-2 rounded-md text-center"
                 onClick={() => setIsMobileMenuOpen(false)}
               >

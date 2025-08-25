@@ -194,14 +194,14 @@ export default function EsqueciSenha() {
           <br></br>
           <div className="mt-8 space-y-4">
             <div className="flex items-center justify-center space-x-2">
-              <span className="h-px flex-1 bg-gray-300"></span>
-              <span className="text-sm text-gray-500 font-medium">ou</span>
-              <span className="h-px flex-1 bg-gray-300"></span>
+        
+              <span className="text-sm text-gray-500 font-medium">------------------------------          ou         ------------------------------</span>
+             
             </div>
             <br></br>
             <div className="text-center">
               <button
-                onClick={() => router.push('/login')}
+                onClick={() => router.push('/')}
                 className="text-red-800 hover:text-red-600 font-medium transition duration-200"
               >
                 Voltar para o login

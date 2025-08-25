@@ -23,8 +23,8 @@ export default function Home() {
       <div className="absolute inset-0 bg-black/40" />
  
       {/* Página */}
-      <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white">
-        <h1 className="text-5xl font-bold mb-20">Logue com seu e-mail institucional!
+      <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-gray-400">
+        <h1 className="text-3xl font-bold mb-20">Logue com seu e-mail institucional, se não tiver um entre em contato
         </h1>
  
         <br />
@@ -38,7 +38,7 @@ export default function Home() {
                        shadow-lg
                        transition-all duration-300 ease-out
                        hover:bg-red-600 hover:scale-105 hover:shadow-xl
-                       active:scale-95 focus:outline-none focus:ring-4 focus:ring-red-500/40"onClick={() => router.push("/login")}
+                       active:scale-95 focus:outline-none focus:ring-4 focus:ring-red-500/40"onClick={() => router.push("/")}
           >
             Entre
           </button>
