@@ -78,7 +78,7 @@ CREATE TABLE historico_chamados (
     chamado_id INT NOT NULL,
     acao VARCHAR(255),
     usuario_id INT,
-    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    criado_em DATE,
     FOREIGN KEY (chamado_id) REFERENCES chamados(id)
 );
 
@@ -151,4 +151,6 @@ SELECT
 FROM chamados c 
 LEFT JOIN pool p ON c.tipo_id = p.id
 LEFT JOIN usuarios u ON c.tecnico_id = u.id
-ORDER BY c.criado_em DESC;
+ORDER BY c.criado_em DESC; 
+
+

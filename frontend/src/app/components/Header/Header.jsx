@@ -10,6 +10,7 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
 
+  // Pega usuário do localStorage
   useEffect(() => {
     const dados = localStorage.getItem("usuarioAutenticado");
     if (dados) {
@@ -17,6 +18,7 @@ export default function Header() {
     }
   }, []);
 
+  // Logout
   const handleLogout = () => {
     localStorage.removeItem("usuarioAutenticado");
     setUsuarioAutenticado(null);
@@ -25,12 +27,10 @@ export default function Header() {
     router.push("/");
   };
 
+  // Nome do usuário
   const getNomeUsuario = () => {
     if (!usuarioAutenticado) return "";
-    // Se tiver nome vindo do backend, use aqui:
-    if (usuarioAutenticado.nome) return usuarioAutenticado.nome;
-    // Caso contrário, mostra só o prefixo do e-mail
-    return usuarioAutenticado.email?.split("@")[0] || "";
+    return usuarioAutenticado.nome || usuarioAutenticado.email?.split("@")[0] || "";
   };
 
   return (
@@ -40,7 +40,7 @@ export default function Header() {
           {/* Logo + Nome */}
           <div className="flex items-center gap-4">
             <img
-              src="imgs//logo.png"
+              src="imgs/logo.png"
               alt="Logo SENAI"
               className="h-10 w-auto object-contain"
             />
@@ -79,7 +79,7 @@ export default function Header() {
                   <div className="absolute right-0 mt-2 w-40 bg-red-950 rounded-md shadow-lg z-10">
                     <button
                       onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2 text-gray-400 bg-red-950"
+                      className="block w-full text-left px-4 py-2 text-gray-400 bg-red-950 hover:bg-red-900"
                     >
                       Sair
                     </button>
@@ -90,13 +90,13 @@ export default function Header() {
               <>
                 <Link
                   href="/"
-                  className="px-4 py-2 bg-red-950 rounded text-gray-400 font-bold"
+                  className="px-4 py-2 bg-red-950 rounded text-gray-400 font-bold hover:text-gray-200"
                 >
                   Entrar
                 </Link>
                 <Link
-                  href="/cadastro" // aqui corrigi, antes era /cadastro
-                  className="px-4 py-2 bg-red-950 rounded text-gray-400 font-bold"
+                  href="/cadastro"
+                  className="px-4 py-2 bg-red-950 rounded text-gray-400 font-bold hover:text-gray-200"
                 >
                   Cadastre-se
                 </Link>
@@ -140,7 +140,7 @@ export default function Header() {
               </div>
               <button
                 onClick={handleLogout}
-                className="block w-full bg-red-950 text-gray-400 font-bold py-2 rounded-md text-center"
+                className="block w-full bg-red-950 text-gray-400 font-bold py-2 rounded-md text-center hover:bg-red-900"
               >
                 Sair
               </button>
@@ -149,14 +149,14 @@ export default function Header() {
             <>
               <Link
                 href="/"
-                className="block w-full bg-red-950 text-gray-200 font-bold py-2 rounded-md text-center"
+                className="block w-full bg-red-950 text-gray-200 font-bold py-2 rounded-md text-center hover:bg-red-900"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Entrar
               </Link>
               <Link
-                href="/cadastro" // corrigido aqui também
-                className="block w-full bg-red-950 text-gray-200 font-bold py-2 rounded-md text-center"
+                href="/cadastro"
+                className="block w-full bg-red-950 text-gray-200 font-bold py-2 rounded-md text-center hover:bg-red-900"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Cadastre-se

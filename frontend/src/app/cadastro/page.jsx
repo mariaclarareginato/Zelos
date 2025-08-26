@@ -68,7 +68,7 @@ export default function Cadastro() {
         funcao: 'Administrador' // garante que será cadastrado como admin
       });
       alert(res.data.mensagem);
-      router.push('/login');
+      router.push('/');
     } catch (err) {
       alert(err.response?.data?.erro || 'Erro no cadastro');
     }

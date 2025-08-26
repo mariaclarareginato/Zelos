@@ -15,42 +15,13 @@ const db = mysql.createPool({
   host: "localhost",
   user: "root",      
   password: "",       
-  database: "zelossite",  
+  database: "zelossitesenai",  
 });
 
 
-
-app.post("/login", async (req, res) => {
-  const { email, senha } = req.body;
-
-  if (!email || !senha) return res.status(400).json({ mensagem: "Email e senha são obrigatórios." });
-
-  try {
-    const [rows] = await db.query("SELECT * FROM usuarios WHERE email = ?", [email]);
-    if (rows.length === 0) return res.status(401).json({ mensagem: "Usuário não encontrado." });
-
-    const usuario = rows[0];
-    const senhaValida = await bcrypt.compare(senha, usuario.senha);
-
-    if (!senhaValida) return res.status(401).json({ mensagem: "Senha incorreta." });
-
-    // Gera token
-    const token = jwt.sign({ id: usuario.id, funcao: usuario.funcao, email: usuario.email }, JWT_SECRET, { expiresIn: "1h" });
-
-    // Retorna token e dados do usuário
-    res.json({
-      mensagem: "Login realizado com sucesso!",
-      token,
-      email: usuario.email,
-      funcao: usuario.funcao
-    });
-  } catch (erro) {
-    console.error(erro);
-    res.status(500).json({ mensagem: "Erro no servidor." });
-  }
-});
 
 // Rota de cadastro de admin
+
 app.post('/cadastro', async (req, res) => {
     const { cpf, email, senha, funcao } = req.body;
   
