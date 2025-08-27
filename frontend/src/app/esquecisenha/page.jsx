@@ -31,7 +31,7 @@ export default function EsqueciSenha() {
     }
   
  
-    const dominiosPermitidos = ["@administrador..com", "@tecnico.com", "@senaisp.com"];
+    const dominiosPermitidos = ["@administradorsenai.com", "@tecnicosenai.com", "@senaisp.com"];
     const emailValido = dominiosPermitidos.some((dominio) => email.endsWith(dominio));
   
     if (!emailValido) {
@@ -41,7 +41,7 @@ export default function EsqueciSenha() {
   
     try {
      
-      const resposta = await axios.post("http://localhost:3004/esquecisenha", {
+      const resposta = await axios.post("http://localhost:3004/api/esquecisenha", {
         email,
         novaSenha,
       });

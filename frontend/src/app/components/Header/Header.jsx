@@ -51,6 +51,7 @@ export default function Header() {
           </div>
 
           {/* Menu Desktop */}
+
           <div className="hidden md:flex items-center gap-4">
             {usuarioAutenticado ? (
               <div className="relative">
@@ -132,6 +133,7 @@ export default function Header() {
       </div>
 
       {/* Menu Mobile */}
+
       {isMobileMenuOpen && (
         <div className="md:hidden px-4 pb-4 space-y-2">
           {usuarioAutenticado ? (
@@ -141,7 +143,7 @@ export default function Header() {
               </div>
               <button
                 onClick={handleLogout}
-                className="block w-full bg-red-950 text-gray-400 font-bold py-2 rounded-md text-center hover:bg-red-900"
+                className="block w-full bg-red-950 text-gray-400 font-bold py-2 rounded-md text-center"
               >
                 Sair
               </button>
@@ -150,14 +152,14 @@ export default function Header() {
             <>
               <Link
                 href="/"
-                className="block w-full bg-red-950 text-gray-200 font-bold py-2 rounded-md text-center hover:bg-red-900"
+                className="block w-full bg-red-950 text-gray-200 font-bold py-2 rounded-md text-center"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Entrar
               </Link>
               <Link
                 href="/cadastro"
-                className="block w-full bg-red-950 text-gray-200 font-bold py-2 rounded-md text-center hover:bg-red-900"
+                className="block w-full bg-red-950 text-gray-200 font-bold py-2 rounded-md text-center"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Cadastre-se

@@ -322,7 +322,7 @@ app.delete("/api/chamados/excluir/:id", authMiddleware, async (req, res) => {
 
 
 
-// ------------------ APONTAMENTOS ------------------
+// ------------------ APONTAMENTOS ------------------                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
 
 app.post("/api/apontamentos", authMiddleware, async (req, res) => {
   try {
@@ -338,6 +338,45 @@ app.post("/api/apontamentos", authMiddleware, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+
+// Atualizar status do chamado (apenas técnico responsável)
+app.put("/api/chamados/:id/status", authMiddleware, async (req, res) => {
+  try {
+    const chamadoId = req.params.id;
+    const { status } = req.body;
+    const tecnicoId = req.user.id; // técnico logado
+
+    if (!status) return res.status(400).json({ message: "O campo 'status' é obrigatório" });
+
+    // Busca o chamado
+    const [rows] = await db.query("SELECT * FROM chamados WHERE id = ?", [chamadoId]);
+    if (rows.length === 0) return res.status(404).json({ message: "Chamado não encontrado" });
+
+    const chamado = rows[0];
+
+    // Verifica se o técnico é o responsável
+    if (chamado.tecnico_id !== tecnicoId) {
+      return res.status(403).json({ message: "Você não pode atualizar o status deste chamado" });
+    }
+
+    // Atualiza status
+    await db.query("UPDATE chamados SET status = ? WHERE id = ?", [status, chamadoId]);
+
+    // Adiciona ao histórico
+    const descricao = `Status alterado de "${chamado.status}" para "${status}"`;
+    await db.query(
+      "INSERT INTO historico_chamados (chamado_id, acao, usuario_id, criado_em) VALUES (?, ?, ?, NOW())",
+      [chamadoId, descricao, tecnicoId]
+    );
+
+    res.json({ message: "Status do chamado atualizado com sucesso!" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erro ao atualizar status do chamado", error: err.message });
+  }
+});
+
 
 // ------------------ Start Server ------------------
 app.listen(3005, () => {

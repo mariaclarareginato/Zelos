@@ -1,40 +1,42 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
-let jwtDecode;
-if (typeof window !== "undefined") {
-  jwtDecode = (await import("jwt-decode")).default;
-}
 
 export default function PainelUsuario() {
   const [usuarioId, setUsuarioId] = useState(null);
   const [token, setToken] = useState(null);
-
   const [meusChamados, setMeusChamados] = useState([]);
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
   const [tipoId, setTipoId] = useState("");
   const [mensagem, setMensagem] = useState("");
 
-  // Pegar token e ID do usuário
+  // Pegar token e id do usuário do localStorage
   useEffect(() => {
-    const t = localStorage.getItem("token");
-    setToken(t);
-    if (t && jwtDecode) {
-      const decoded = jwtDecode(t);
-      setUsuarioId(decoded.id);
+    const usuario = JSON.parse(localStorage.getItem("usuarioAutenticado"));
+    if (usuario) {
+      setToken(usuario.token);
+      setUsuarioId(usuario.id);
     }
   }, []);
 
   // Carregar chamados do usuário
   useEffect(() => {
     if (!usuarioId || !token) return;
-    fetch(`http://localhost:3005/api/chamados/meus-chamados/${usuarioId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then(setMeusChamados)
-      .catch(() => setMeusChamados([]));
+
+    const fetchChamados = async () => {
+      try {
+        const res = await fetch(`http://localhost:3005/api/chamados/meus-chamados/${usuarioId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setMeusChamados(data);
+      } catch {
+        setMeusChamados([]);
+      }
+    };
+
+    fetchChamados();
   }, [usuarioId, token]);
 
   // Criar chamado
@@ -74,67 +76,64 @@ export default function PainelUsuario() {
   }
 
   return (
-    <main className="p-6 bg-black min-h-screen">
-      <h1 className="text-center text-3xl font-bold mt-20 text-gray-400 underline">Painel do Usuário</h1>
+    <main className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 p-6">
+      <br></br><br></br>
+      <h1 className="text-center text-5xl font-extrabold text-red-500 mb-12 drop-shadow-lg">Painel do Usuário</h1>
 
-      {/* Formulário para criar chamado */}
-      <section className="my-6 flex flex-col items-center">
-  <h2 className="text-xl text-center text-gray-400 mb-4">Abrir chamado</h2>
-  
-  <form onSubmit={criarChamado} className="w-full max-w-md flex flex-col items-center space-y-4">
-    <input
-      type="text"
-      placeholder="Título"
-      value={titulo}
-      onChange={(e) => setTitulo(e.target.value)}
-      className="w-full px-4 py-2 rounded text-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-    />
+      {/* Formulário Criar Chamado */}
+      <section className="mb-12">
+        <h2 className="text-3xl text-gray-200 mb-6 text-center font-semibold">Abrir Chamado</h2>
+        <form onSubmit={criarChamado} className="max-w-lg mx-auto bg-gray-700 p-6 rounded-xl shadow-xl flex flex-col space-y-4">
+          <input
+            type="text"
+            placeholder="Título"
+            value={titulo}
+            onChange={(e) => setTitulo(e.target.value)}
+            className="w-full px-4 py-2 rounded text-gray-100 bg-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+          />
+          <br></br>
+          <textarea
+            placeholder="Descrição"
+            value={descricao}
+            onChange={(e) => setDescricao(e.target.value)}
+            className="w-full px-4 py-2 rounded text-gray-100 bg-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+          />
+          <br></br>
+          <input
+            type="number"
+            placeholder="ID do tipo"
+            value={tipoId}
+            onChange={(e) => setTipoId(e.target.value)}
+            className="w-full px-4 py-2 rounded text-gray-100 bg-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+          />
+          <br></br>
+          <button
+            type="submit"
+            className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded font-semibold transition duration-200"
+          >
+            Criar Chamado +
+          </button>
+          <br></br>
+          {mensagem && <p className="text-center text-red-300">{mensagem}</p>}
+        </form>
+      </section>
 
-    <br></br>
-
-    <textarea
-      placeholder="Descrição"
-      value={descricao}
-      onChange={(e) => setDescricao(e.target.value)}
-      className="w-full px-4 py-2 rounded text-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-    />
-
-<br></br>
-    <input
-      type="number"
-      placeholder="ID"
-      value={tipoId}
-      onChange={(e) => setTipoId(e.target.value)}
-      className="w-full px-4 py-2 rounded text-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-    />
-    <br></br>
-
-    <button
-      type="submit"
-      className="w-full bg-red-900 text-gray-300 py-2 rounded hover:bg-red-800"
-    >
-      Criar Chamado +
-    </button>
-  </form>
-
-  <br></br>
-
-  {mensagem && <p className="text-center text-red-400 mt-2">{mensagem}</p>}
-</section>
-
-      {/* Lista de chamados */}
-      <section className="my-6">
-        <h2 className="text-xl text-center text-gray-400 mb-4">Seus Chamados:</h2>
+      {/* Lista de Chamados */}
+      <section>
+        <h2 className="text-3xl text-gray-200 mb-6 text-center font-semibold">Seus Chamados</h2>
         {meusChamados.length === 0 ? (
           <p className="text-center text-red-400">Você não tem chamados.</p>
         ) : (
-          <ul className="max-w-md mx-auto space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {meusChamados.map((chamado) => (
-              <li key={chamado.id} className="border p-3 rounded bg-gray-500 text-red-900">
-                <b>{chamado.titulo}</b> — Status: {chamado.status} — Técnico: {chamado.tecnico || "Não atribuído"}
-              </li>
+              <div key={chamado.id} className="bg-gray-700 p-6 rounded-xl shadow-xl hover:scale-105 transform transition duration-300">
+                <h3 className="text-red-400 font-bold text-xl mb-2">{chamado.titulo}</h3>
+                <p className="text-gray-200 mb-2">{chamado.descricao}</p>
+                <p className="text-gray-300 mb-1"><b>Status:</b> {chamado.status}</p>
+                <p className="text-gray-300"><b>Técnico:</b> {chamado.tecnico || "Não atribuído"}</p>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </section>
     </main>

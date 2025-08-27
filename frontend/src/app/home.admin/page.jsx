@@ -1,290 +1,289 @@
-"use client";
+'use client';
+
 import { useEffect, useState } from "react";
 
-// ✅ Import ESM correto para Next.js 13
-let jwtDecode;
-if (typeof window !== "undefined") {
-  jwtDecode = (await import("jwt-decode")).default;
-}
-
 export default function HomeAdmin() {
-  const [chamados, setChamados] = useState([]);
-  const [tecnicos, setTecnicos] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
-  const [selectedChamadoId, setSelectedChamadoId] = useState("");
-  const [novoStatus, setNovoStatus] = useState("");
-  const [selectedTecnicoId, setSelectedTecnicoId] = useState("");
-  const [historico, setHistorico] = useState([]);
-  const [message, setMessage] = useState("");
-
+  const [chamados, setChamados] = useState([]);
   const [token, setToken] = useState(null);
-  const [usuarioLogadoId, setUsuarioLogadoId] = useState(null);
+  const [mensagem, setMensagem] = useState("");
 
-  // Pegando token e id do usuário logado
+  const [editUsuario, setEditUsuario] = useState(null);
+  const [editChamado, setEditChamado] = useState(null);
+
   useEffect(() => {
-    const t = localStorage.getItem("token");
-    setToken(t);
-    if (t && jwtDecode) {
-      const decoded = jwtDecode(t);
-      setUsuarioLogadoId(decoded.id);
-    }
+    const usuario = JSON.parse(localStorage.getItem("usuarioAutenticado"));
+    if (usuario) setToken(usuario.token);
   }, []);
 
-  // Carregando chamados, técnicos e usuários
   useEffect(() => {
     if (!token) return;
-
-    async function fetchData() {
-      try {
-        const [resChamados, resTecnicos, resUsuarios] = await Promise.all([
-          fetch("http://localhost:3005/api/chamados", { headers: { Authorization: `Bearer ${token}` } }),
-          fetch("http://localhost:3005/api/usuarios?role=tecnico", { headers: { Authorization: `Bearer ${token}` } }),
-          fetch("http://localhost:3005/api/usuarios", { headers: { Authorization: `Bearer ${token}` } }),
-        ]);
-
-        setChamados(await resChamados.json());
-        setTecnicos(await resTecnicos.json());
-        setUsuarios(await resUsuarios.json());
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    fetchData();
+    fetchUsuarios();
+    fetchChamados();
   }, [token]);
 
-  // Atualiza histórico sempre que o chamado selecionado muda
-  useEffect(() => {
-    if (!selectedChamadoId) {
-      setHistorico([]);
-      setNovoStatus("");
-      setSelectedTecnicoId("");
-      return;
+  const fetchUsuarios = async () => {
+    try {
+      const res = await fetch("http://localhost:3005/api/usuarios", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setUsuarios(await res.json());
+    } catch (err) {
+      console.error(err);
     }
+  };
 
-    const chamado = chamados.find(c => c.id === Number(selectedChamadoId));
-    if (chamado) {
-      setNovoStatus(chamado.status || "");
-      setSelectedTecnicoId(chamado.tecnico_id || "");
+  const fetchChamados = async () => {
+    try {
+      const res = await fetch("http://localhost:3005/api/chamados", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setChamados(await res.json());
+    } catch (err) {
+      console.error(err);
     }
+  };
 
-    async function fetchHistorico() {
-      try {
-        const res = await fetch(`http://localhost:3005/api/chamados/historico/${selectedChamadoId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        setHistorico(data);
-      } catch (error) {
-        console.error(error);
-        setHistorico([]);
-      }
-    }
+  // ---------- Usuários ----------
+  const atualizarUsuario = async () => {
+    if (!editUsuario) return;
 
-    fetchHistorico();
-
-    // Atualiza automaticamente a cada 5s
-    const interval = setInterval(fetchHistorico, 5000);
-    return () => clearInterval(interval);
-  }, [selectedChamadoId, chamados, token]);
-
-  // Atualizar chamado
-  async function atualizarChamado() {
-    if (!selectedChamadoId) {
-      setMessage("Selecione um chamado");
-      return;
-    }
-
-    const dados = {
-      usuario_id: usuarioLogadoId,
-      status: novoStatus,
-      tecnico_id: selectedTecnicoId || null,
-    };
+    const { id, nome, email, funcao, status } = editUsuario;
 
     try {
-      const res = await fetch(`http://localhost:3005/api/chamados/${selectedChamadoId}`, {
+      const res = await fetch(`http://localhost:3005/api/usuarios/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify(dados),
+        body: JSON.stringify({ nome, email, funcao, status })
       });
       const data = await res.json();
-      setMessage(data.message || "Atualizado com sucesso");
-
-      // Atualiza lista de chamados
-      const chamadosRes = await fetch("http://localhost:3005/api/chamados", { headers: { Authorization: `Bearer ${token}` } });
-      setChamados(await chamadosRes.json());
-    } catch (error) {
-      console.error(error);
-      setMessage("Erro ao atualizar");
+      setMensagem(data.message || "Usuário atualizado!");
+      setEditUsuario(null);
+      fetchUsuarios();
+    } catch (err) {
+      console.error(err);
+      setMensagem("Erro ao atualizar usuário");
     }
-  }
+  };
 
-  // Fechar chamado
-  async function fecharChamado() {
-    if (!selectedChamadoId) return;
-    try {
-      const res = await fetch(`http://localhost:3005/api/chamados/${selectedChamadoId}/fechar`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      setMessage(data.message || "Chamado fechado");
-
-      // Atualiza lista de chamados
-      const chamadosRes = await fetch("http://localhost:3005/api/chamados", { headers: { Authorization: `Bearer ${token}` } });
-      setChamados(await chamadosRes.json());
-    } catch (error) {
-      console.error(error);
-      setMessage("Erro ao fechar");
-    }
-  }
-
-  // Deletar chamado
-  async function deletarChamado() {
-    if (!selectedChamadoId) return;
-
-    if (!confirm("Tem certeza que deseja deletar este chamado?")) return;
+  const deletarUsuario = async (id) => {
+    if (!confirm("Deseja realmente deletar este usuário?")) return;
 
     try {
-      const res = await fetch(`http://localhost:3005/api/chamados/excluir/${selectedChamadoId}`, {
+      const res = await fetch(`http://localhost:3005/api/usuarios/${id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` }
       });
-
       const data = await res.json();
-      setMessage(data.message || "Chamado deletado com sucesso!");
-
-      // Atualiza lista de chamados
-      const chamadosRes = await fetch("http://localhost:3005/api/chamados", { headers: { Authorization: `Bearer ${token}` } });
-      setChamados(await chamadosRes.json());
-
-      // Limpa seleção e histórico
-      setSelectedChamadoId("");
-      setHistorico([]);
-      setNovoStatus("");
-      setSelectedTecnicoId("");
-    } catch (error) {
-      console.error(error);
-      setMessage("Erro ao deletar chamado");
+      setMensagem(data.message || "Usuário deletado!");
+      fetchUsuarios();
+    } catch (err) {
+      console.error(err);
+      setMensagem("Erro ao deletar usuário");
     }
-  }
+  };
+
+  // ---------- Chamados ----------
+  const atualizarChamado = async () => {
+    if (!editChamado) return;
+    const { id, titulo, descricao, status, tecnico_id } = editChamado;
+
+    try {
+      const res = await fetch(`http://localhost:3005/api/chamados/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ titulo, descricao, status, tecnico_id, usuario_id: editChamado.usuario_id })
+      });
+      const data = await res.json();
+      setMensagem(data.message || "Chamado atualizado!");
+      setEditChamado(null);
+      fetchChamados();
+    } catch (err) {
+      console.error(err);
+      setMensagem("Erro ao atualizar chamado");
+    }
+  };
+
+  const deletarChamado = async (id) => {
+    if (!confirm("Deseja realmente deletar este chamado?")) return;
+
+    try {
+      const res = await fetch(`http://localhost:3005/api/chamados/excluir/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      setMensagem(data.message || "Chamado deletado!");
+      fetchChamados();
+    } catch (err) {
+      console.error(err);
+      setMensagem("Erro ao deletar chamado");
+    }
+  };
 
   return (
-    <main className="p-6 bg-black min-h-screen">
-      <br></br>
-      <h1 className="text-3xl font-bold mt-20 text-center text-gray-400 underline">Painel do Administrador</h1>
+    <main className="min-h-screen bg-gray-900 p-6">
+      <h1 className="text-5xl font-extrabold text-red-500 text-center mb-12 drop-shadow-lg">Painel do Administrador</h1>
 
-      {/* Seletor de chamado */}
-      <section className="flex justify-center mb-6 mt-6">
-        <select
-          className="text-center border rounded p-2 w-full max-w-md bg-gray-500 text-red-900"
-          value={selectedChamadoId}
-          onChange={(e) => setSelectedChamadoId(e.target.value)}
-        >
-          <option value="">-- Selecione um chamado --</option>
-          {chamados.map(c => (
-            <option key={c.id} value={c.id}>{c.titulo}</option>
-          ))}
-        </select>
+      {mensagem && <p className="text-center text-green-400 mb-4">{mensagem}</p>}
+
+      {/* --------- USUÁRIOS --------- */}
+      <section className="mb-12">
+        <h2 className="text-3xl text-gray-200 mb-6 text-center font-semibold">Usuários</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full text-gray-200 bg-gray-800 rounded-lg overflow-hidden">
+            <thead className="bg-gray-700">
+              <tr>
+                <th className="p-3">Nome</th>
+                <th>Email</th>
+                <th>Função</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {usuarios.map(u => (
+                <tr key={u.id} className="border-b border-gray-700">
+                  <td className="p-2">
+                    {editUsuario?.id === u.id ? (
+                      <input
+                        className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+                        value={editUsuario.nome}
+                        onChange={e => setEditUsuario({ ...editUsuario, nome: e.target.value })}
+                      />
+                    ) : u.nome}
+                  </td>
+                  <td className="p-2">
+                    {editUsuario?.id === u.id ? (
+                      <input
+                        className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+                        value={editUsuario.email}
+                        onChange={e => setEditUsuario({ ...editUsuario, email: e.target.value })}
+                      />
+                    ) : u.email}
+                  </td>
+                  <td className="p-2">
+                    {editUsuario?.id === u.id ? (
+                      <select
+                        className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+                        value={editUsuario.funcao}
+                        onChange={e => setEditUsuario({ ...editUsuario, funcao: e.target.value })}
+                      >
+                        <option value="admin">Admin</option>
+                        <option value="tecnico">Técnico</option>
+                        <option value="usuario">Usuário</option>
+                      </select>
+                    ) : u.funcao}
+                  </td>
+                  <td className="p-2">
+                    {editUsuario?.id === u.id ? (
+                      <select
+                        className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+                        value={editUsuario.status}
+                        onChange={e => setEditUsuario({ ...editUsuario, status: e.target.value })}
+                      >
+                        <option value="ativo">Ativo</option>
+                        <option value="inativo">Inativo</option>
+                      </select>
+                    ) : u.status}
+                  </td>
+                  <td className="p-2 space-x-2">
+                    {editUsuario?.id === u.id ? (
+                      <>
+                        <button onClick={atualizarUsuario} className="bg-green-500 px-3 py-1 rounded hover:bg-green-600">Salvar</button>
+                        <button onClick={() => setEditUsuario(null)} className="bg-gray-500 px-3 py-1 rounded hover:bg-gray-600">Cancelar</button>
+                      </>
+                    ) : (
+                      <>
+                        <button onClick={() => setEditUsuario(u)} className="bg-blue-500 px-3 py-1 rounded hover:bg-blue-600">Editar</button>
+                        <button onClick={() => deletarUsuario(u.id)} className="bg-red-500 px-3 py-1 rounded hover:bg-red-600">Deletar</button>
+                      </>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
 
-      {/* Edição do chamado */}
-      {selectedChamadoId && (
-        <section className="mb-6 bg-gray-400 p-4 rounded shadow">
-          <h2 className="text-center text-lg font-semibold mb-2 text-red-900">Editar Chamado</h2>
-
-          {/* Status */}
-          <div className="mb-2 bg-gray-400">
-            <label className="block mb-1 text-red-900">Status:</label>
-            <select
-              className="border rounded p-2 w-full bg-gray-500 text-red-900"
-              value={novoStatus}
-              onChange={(e) => setNovoStatus(e.target.value)}
-            >
-              <option value="">-- Selecione --</option>
-              <option value="pendente">Pendente</option>
-              <option value="em andamento">Em andamento</option>
-              <option value="concluído">Concluído</option>
-            </select>
-          </div>
-
-          {/* Técnico */}
-          <div className="mb-4">
-            <label className="block mb-1 text-red-900">Técnico:</label>
-            <select
-              className="border rounded p-2 w-full bg-gray-500 text-red-900"
-              value={selectedTecnicoId}
-              onChange={(e) => setSelectedTecnicoId(e.target.value)}
-            >
-              <option value="">-- Sem técnico --</option>
-              {tecnicos.map(t => (
-                <option key={t.id} value={t.id}>{t.nome}</option>
+      {/* --------- CHAMADOS --------- */}
+      <section className="mb-12">
+        <h2 className="text-3xl text-gray-200 mb-6 text-center font-semibold">Chamados</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full text-gray-200 bg-gray-800 rounded-lg overflow-hidden">
+            <thead className="bg-gray-700">
+              <tr>
+                <th className="p-3">Título</th>
+                <th>Descrição</th>
+                <th>Status</th>
+                <th>Técnico</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {chamados.map(c => (
+                <tr key={c.id} className="border-b border-gray-700">
+                  <td className="p-2">
+                    {editChamado?.id === c.id ? (
+                      <input
+                        className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+                        value={editChamado.titulo}
+                        onChange={e => setEditChamado({ ...editChamado, titulo: e.target.value })}
+                      />
+                    ) : c.titulo}
+                  </td>
+                  <td className="p-2">
+                    {editChamado?.id === c.id ? (
+                      <textarea
+                        className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+                        value={editChamado.descricao}
+                        onChange={e => setEditChamado({ ...editChamado, descricao: e.target.value })}
+                      />
+                    ) : c.descricao}
+                  </td>
+                  <td className="p-2">
+                    {editChamado?.id === c.id ? (
+                      <select
+                        className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+                        value={editChamado.status}
+                        onChange={e => setEditChamado({ ...editChamado, status: e.target.value })}
+                      >
+                        <option value="pendente">Pendente</option>
+                        <option value="em andamento">Em andamento</option>
+                        <option value="concluído">Concluído</option>
+                      </select>
+                    ) : c.status}
+                  </td>
+                  <td className="p-2">
+                    {editChamado?.id === c.id ? (
+                      <input
+                        type="number"
+                        className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+                        value={editChamado.tecnico_id || ""}
+                        onChange={e => setEditChamado({ ...editChamado, tecnico_id: Number(e.target.value) })}
+                      />
+                    ) : c.tecnico || "-"}
+                  </td>
+                  <td className="p-2 space-x-2">
+                    {editChamado?.id === c.id ? (
+                      <>
+                        <button onClick={atualizarChamado} className="bg-green-500 px-3 py-1 rounded hover:bg-green-600">Salvar</button>
+                        <button onClick={() => setEditChamado(null)} className="bg-gray-500 px-3 py-1 rounded hover:bg-gray-600">Cancelar</button>
+                      </>
+                    ) : (
+                      <>
+                        <button onClick={() => setEditChamado(c)} className="bg-blue-500 px-3 py-1 rounded hover:bg-blue-600">Editar</button>
+                        <button onClick={() => deletarChamado(c.id)} className="bg-red-500 px-3 py-1 rounded hover:bg-red-600">Deletar</button>
+                      </>
+                    )}
+                  </td>
+                </tr>
               ))}
-            </select>
-          </div>
-
-          {/* Botões */}
-          <div className="flex gap-2">
-            <button
-              className="bg-red-900 text-gray-300 px-4 py-2 rounded hover:bg-red-600"
-              onClick={atualizarChamado}
-            >
-              Atualizar
-            </button>
-            <button
-              className="bg-red-900 text-gray-300 px-4 py-2 rounded hover:bg-red-700"
-              onClick={fecharChamado}
-            >
-              Fechar Chamado
-            </button>
-            <button
-              className="bg-red-700 text-gray-300 px-4 py-2 rounded hover:bg-red-500"
-              onClick={deletarChamado}
-            >
-              Deletar Chamado
-            </button>
-          </div>
-
-          {message && <p className="mt-2 text-sm text-red-800">{message}</p>}
-
-          {/* Histórico */}
-          <div className="mt-4">
-            <h3 className="font-semibold mb-2 text-red-900">Histórico</h3>
-            <ul className="list-disc pl-5 text-red-900">
-              {historico.map(h => (
-                <li key={h.id}>
-                  <strong>{h.usuario || "Sistema"}:</strong> {h.acao} - {new Date(h.criado_em).toLocaleString()}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      )}
-
-
-
-      {/* Lista de usuários */}
-      
-      <section className="mt-16 px-4">
-  <h2 className="text-2xl font-bold text-center text-red-500 mb-8">Usuários</h2>
-
-  <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 justify-items-center">
-    {usuarios.map(u => (
-      <li
-        key={u.id}
-        className="bg-gray-800 text-red-500 p-6 rounded-2xl shadow-lg hover:bg-gray-700 transition-transform transform hover:scale-105 flex flex-col gap-2 items-center text-center w-full max-w-xs aspect-[4/3]"
-      >
-        <span className="font-semibold text-lg">{u.nome}</span>
-        <span className="text-sm text-gray-300">{u.funcao}</span>
-        <span className="text-sm text-gray-400">{u.status}</span>
-      </li>
-    ))}
-  </ul>
-</section>
-
-
-
-
+            </tbody>
+          </table>
+        </div>
+      </section>
     </main>
   );
 }

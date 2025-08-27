@@ -13,13 +13,11 @@ export default function HomeTecnico() {
   const [token, setToken] = useState(null);
   const [tecnicoId, setTecnicoId] = useState(null);
 
-  // Campos do apontamento
   const [descricaoApontamento, setDescricaoApontamento] = useState("");
   const [comeco, setComeco] = useState("");
   const [fimatendimento, setFimAtendimento] = useState("");
   const [apontamentoMessage, setApontamentoMessage] = useState("");
 
-  // Pega token e id do localStorage
   useEffect(() => {
     const usuario = JSON.parse(localStorage.getItem("usuarioAutenticado"));
     if (usuario) {
@@ -28,7 +26,6 @@ export default function HomeTecnico() {
     }
   }, []);
 
-  // Atualiza chamados disponíveis e meus chamados
   useEffect(() => {
     if (!token || !tecnicoId) return;
 
@@ -36,7 +33,7 @@ export default function HomeTecnico() {
       try {
         const [resDisponiveis, resMeus] = await Promise.all([
           fetch("http://localhost:3005/api/chamados/disponiveis", { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`http://localhost:3005/api/chamados/tecnico/2`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`http://localhost:3005/api/chamados/tecnico/${tecnicoId}`, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
         setChamadosDisponiveis(await resDisponiveis.json());
         setMeusChamados(await resMeus.json());
@@ -48,7 +45,6 @@ export default function HomeTecnico() {
     fetchData();
   }, [token, tecnicoId]);
 
-  // Atualiza histórico e status ao selecionar chamado
   useEffect(() => {
     if (!selectedChamadoId) {
       setHistorico([]);
@@ -74,7 +70,6 @@ export default function HomeTecnico() {
     fetchHistorico();
   }, [selectedChamadoId, meusChamados, token]);
 
-  // Função para atualizar meus chamados
   const atualizarMeusChamados = async () => {
     if (!token || !tecnicoId) return;
     try {
@@ -87,7 +82,6 @@ export default function HomeTecnico() {
     }
   };
 
-  // Assumir um chamado disponível
   const assumirChamado = async (id) => {
     try {
       const res = await fetch(`http://localhost:3005/api/chamados/assumir/${id}`, {
@@ -97,7 +91,6 @@ export default function HomeTecnico() {
       });
       const data = await res.json();
       setMessage(data.message || "Chamado assumido!");
-
       await atualizarMeusChamados();
       const resDisponiveis = await fetch("http://localhost:3005/api/chamados/disponiveis", { headers: { Authorization: `Bearer ${token}` } });
       setChamadosDisponiveis(await resDisponiveis.json());
@@ -107,27 +100,27 @@ export default function HomeTecnico() {
     }
   };
 
-  // Atualiza status do chamado
-  const atualizarChamado = async () => {
-    if (!selectedChamadoId) return;
+  const atualizarStatusChamado = async () => {
+    if (!selectedChamadoId || !novoStatus) return;
 
     try {
-      const res = await fetch(`http://localhost:3005/api/chamados/${selectedChamadoId}`, {
+      const res = await fetch(`http://localhost:3005/api/chamados/${selectedChamadoId}/status`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ status: novoStatus, usuario_id: tecnicoId }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: novoStatus }),
       });
       const data = await res.json();
-      setMessage(data.message || "Chamado atualizado!");
-
+      setMessage(data.message || "Status atualizado!");
       await atualizarMeusChamados();
     } catch (err) {
       console.error(err);
-      setMessage("Erro ao atualizar chamado");
+      setMessage("Erro ao atualizar status");
     }
   };
 
-  // Criar apontamento
   const criarApontamento = async () => {
     if (!selectedChamadoId || !descricaoApontamento || !comeco || !fimatendimento) {
       setApontamentoMessage("Preencha todos os campos do apontamento!");
@@ -148,18 +141,13 @@ export default function HomeTecnico() {
       });
       const data = await res.json();
       setApontamentoMessage(data.message || "Apontamento registrado!");
-
-      // Limpa campos
       setDescricaoApontamento("");
       setComeco("");
       setFimAtendimento("");
-
-      // Atualiza histórico local
       setHistorico(prev => [
         ...prev,
         { id: data.id || Date.now(), descricao: descricaoApontamento }
       ]);
-
     } catch (err) {
       console.error(err);
       setApontamentoMessage("Erro ao registrar apontamento");
@@ -167,68 +155,111 @@ export default function HomeTecnico() {
   };
 
   return (
-    <main className="p-6 bg-black min-h-screen">
-      <h1 className="text-3xl font-bold mt-10 text-center text-gray-400 underline">Painel do Técnico</h1>
+    <main className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 p-6">
+      <br></br><br></br>
+      <h1 className="text-5xl font-extrabold text-red-500 text-center mb-12 drop-shadow-lg">Painel do Técnico</h1>
 
-      {/* Chamados disponíveis */}
-      <section className="my-6">
-        <h2 className="text-xl text-center text-gray-400">Chamados disponíveis</h2>
-        {chamadosDisponiveis.length === 0 ? (
-          <p className="text-center text-red-400">Nenhum chamado disponível.</p>
-        ) : (
-          chamadosDisponiveis.map(c => (
-            <div key={c.id} className="border p-3 rounded mb-2 bg-gray-500 text-red-900">
-              <h3 className="font-semibold">{c.titulo}</h3>
-              <p>{c.descricao}</p>
-              <button className="bg-red-900 text-gray-300 px-3 py-1 rounded mt-2" onClick={() => assumirChamado(c.id)}>Assumir</button>
-            </div>
-          ))
-        )}
+      {/* Chamados Disponíveis */}
+      <section className="mb-12">
+        <h2 className="text-3xl text-gray-200 mb-6 text-center font-semibold">Chamados Disponíveis</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {chamadosDisponiveis.length === 0 ? (
+            <p className="text-center text-red-400 col-span-full">Nenhum chamado disponível</p>
+          ) : (
+            chamadosDisponiveis.map(c => (
+              <div key={c.id} className="bg-gray-700 rounded-xl shadow-xl p-6 hover:scale-105 transform transition duration-300">
+                <h3 className="text-red-400 font-bold text-xl mb-2">{c.titulo}</h3>
+                <p className="text-gray-100 mb-4">{c.descricao}</p>
+                <button
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded font-semibold transition duration-200 w-full"
+                  onClick={() => assumirChamado(c.id)}
+                >
+                  Assumir
+                </button>
+              </div>
+            ))
+          )}
+        </div>
       </section>
 
-      {/* Meus chamados */}
-      <section className="my-6">
-        <h2 className="text-xl text-center text-gray-400">Seus chamados</h2>
-        <select
-          className="text-center border rounded p-2 w-full max-w-md bg-gray-500 text-red-900 mb-4"
-          value={selectedChamadoId}
-          onChange={e => setSelectedChamadoId(e.target.value)}
-        >
-          <option value="">-- Selecione um chamado --</option>
-          {meusChamados.map(c => (
-            <option key={c.id} value={c.id}>{c.titulo} ({c.status})</option>
-          ))}
-        </select>
+      {/* Meus Chamados */}
+      <section className="mb-12">
+        <h2 className="text-3xl text-gray-200 mb-6 text-center font-semibold">Meus Chamados</h2>
+        <div className="flex justify-center mb-6">
+          <select
+            className="w-full max-w-lg p-3 rounded-lg bg-gray-700 text-gray-100 border border-gray-600 shadow-md focus:ring-2 focus:ring-red-500"
+            value={selectedChamadoId}
+            onChange={e => setSelectedChamadoId(e.target.value)}
+          >
+            <option value="">-- Selecione um chamado --</option>
+            {meusChamados.map(c => (
+              <option key={c.id} value={c.id}>{c.titulo} ({c.status})</option>
+            ))}
+          </select>
+        </div>
 
         {selectedChamadoId && (
-          <div className="bg-gray-500 text-red-900 p-4 rounded shadow">
-            {/* Status */}
-            <label className="block mb-1 text-red-900">Status:</label>
-            <select className="border rounded p-2 w-full bg-gray-500 text-red-900 mb-2" value={novoStatus} onChange={e => setNovoStatus(e.target.value)}>
-              <option value="">-- Selecione --</option>
-              <option value="pendente">Pendente</option>
-              <option value="em andamento">Em andamento</option>
-              <option value="concluído">Concluído</option>
-            </select>
-            <button className="bg-red-900 text-gray-400 px-4 py-2 rounded hover:bg-red-600 mb-4" onClick={atualizarChamado}>Atualizar</button>
+          <div className="bg-gray-700 p-6 rounded-xl shadow-xl space-y-6">
+            {/* Atualizar Status */}
+            <div className="flex flex-col md:flex-row items-center gap-4">
+              <label className="text-gray-200 font-semibold">Status:</label>
+              <select
+                className="flex-1 p-2 rounded-lg bg-gray-600 text-gray-100"
+                value={novoStatus}
+                onChange={e => setNovoStatus(e.target.value)}
+              >
+                <option value="">-- Selecione --</option>
+                <option value="pendente">Pendente</option>
+                <option value="em andamento">Em andamento</option>
+                <option value="concluído">Concluído</option>
+              </select>
+              <button
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded font-semibold transition duration-200"
+                onClick={atualizarStatusChamado}
+              >
+                Atualizar
+              </button>
+            </div>
 
-            {message && <p className="mt-2 text-sm text-red-800 bg-gray-400 p-1 rounded">{message}</p>}
+            {message && <p className="bg-gray-600 text-red-200 p-2 rounded">{message}</p>}
 
-            {/* Formulário apontamento */}
-            <div className="mt-4 border-t border-gray-700 pt-4">
-              <h3 className="font-semibold mb-2 text-red-900">Registrar Apontamento</h3>
-              <textarea className="w-full p-2 mb-2 rounded bg-gray-600 text-red-900" placeholder="Descrição" value={descricaoApontamento} onChange={e => setDescricaoApontamento(e.target.value)} />
-              <input type="datetime-local" className="w-full p-2 mb-2 rounded bg-gray-600 text-red-900" value={comeco} onChange={e => setComeco(e.target.value)} />
-              <input type="datetime-local" className="w-full p-2 mb-2 rounded bg-gray-600 text-red-900" value={fimatendimento} onChange={e => setFimAtendimento(e.target.value)} />
-              <button className="bg-red-900 text-gray-300 px-4 py-2 rounded hover:bg-red-600" onClick={criarApontamento}>Registrar Apontamento</button>
-              {apontamentoMessage && <p className="mt-2 text-sm text-red-800 bg-gray-400 p-1 rounded">{apontamentoMessage}</p>}
+            {/* Apontamentos */}
+            <div className="border-t border-gray-600 pt-4 space-y-4">
+              <h3 className="text-red-400 font-bold text-xl">Registrar Apontamento</h3>
+              <textarea
+                className="w-full p-3 rounded-lg bg-gray-600 text-gray-100 resize-none"
+                placeholder="Descrição"
+                value={descricaoApontamento}
+                onChange={e => setDescricaoApontamento(e.target.value)}
+              />
+              <div className="flex flex-col md:flex-row gap-4">
+                <input
+                  type="datetime-local"
+                  className="flex-1 p-2 rounded-lg bg-gray-600 text-gray-100"
+                  value={comeco}
+                  onChange={e => setComeco(e.target.value)}
+                />
+                <input
+                  type="datetime-local"
+                  className="flex-1 p-2 rounded-lg bg-gray-600 text-gray-100"
+                  value={fimatendimento}
+                  onChange={e => setFimAtendimento(e.target.value)}
+                />
+              </div>
+              <button
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded font-semibold w-full transition duration-200"
+                onClick={criarApontamento}
+              >
+                Registrar Apontamento
+              </button>
+              {apontamentoMessage && <p className="bg-gray-600 text-red-200 p-2 rounded">{apontamentoMessage}</p>}
             </div>
 
             {/* Histórico */}
             <div className="mt-4">
-              <h3 className="font-semibold mb-2 text-red-900">Histórico</h3>
-              <ul className="list-disc pl-5 text-red-900">
-                {historico.map(h => <li key={h.id}>{h.descricao}</li>)}
+              <h3 className="text-red-400 font-bold text-xl mb-2">Histórico</h3>
+              <ul className="list-disc pl-5 text-gray-200 space-y-1">
+                {historico.map(h => <li key={h.id}>{h.descricao || h.acao}</li>)}
               </ul>
             </div>
           </div>
