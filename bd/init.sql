@@ -1,12 +1,12 @@
-CREATE DATABASE zelossitesenai;
-USE zelossitesenai;
+CREATE DATABASE sitezelos;
+USE sitezelos;
 
 -- Tabela de usuários
 CREATE TABLE usuarios (
 
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
-    senha VARCHAR(255) NOT NULL, -- aqui vai o hash da senha
+    senha VARCHAR(255) NOT NULL,  
     email VARCHAR(255) NOT NULL UNIQUE,
     funcao ENUM('Administrador','Técnico','Usuário') NOT NULL,
     status ENUM('ativo', 'inativo') DEFAULT 'ativo',
@@ -87,7 +87,7 @@ CREATE INDEX idx_usuarios_email ON usuarios(email);
 CREATE INDEX idx_chamados_status ON chamados(status);
 CREATE INDEX idx_apontamentos_comeco_fim ON apontamentos(comeco,fimatendimento);
 
--- Inserir usuários (senhas são placeholders, substitua por hash real)
+-- Inserir usuários 
 INSERT INTO usuarios (nome, senha, email, funcao, status) VALUES
 ('Nicolas de Lima', '$2b$12$LFaOrtNxBWEzdrfpuAcMH.EcjQif9B1uVBLz7wGvp2z7XO7/WIUQ.', 'nicolas@administradorsenai.com', 'Administrador', 'ativo'),
 ('Pedro Vasconcelos', '$2b$12$6bTI/22YqRfGabMdd6qyuOb.gWrDvHzjVTcqhroFivJhqKYWJaCAS', 'pedro@administradorsenai.com', 'Administrador', 'ativo'),
@@ -152,5 +152,4 @@ FROM chamados c
 LEFT JOIN pool p ON c.tipo_id = p.id
 LEFT JOIN usuarios u ON c.tecnico_id = u.id
 ORDER BY c.criado_em DESC; 
-
 

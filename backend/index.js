@@ -13,7 +13,7 @@ const db = mysql.createPool({
   host: "localhost",
   user: "root",
   password: "",
-  database: "zelossitesenai",
+  database: "sitezelos",
 });
 
 const JWT_SECRET = "segredo_super_secreto";
@@ -32,17 +32,27 @@ function authMiddleware(req, res, next) {
 }
 
 // ------------------ LOGIN ------------------
+
 app.post("/login", async (req, res) => {
   try {
     const { email, senha } = req.body;
 
+    // Busca o usuário pelo email
     const [rows] = await db.query("SELECT * FROM usuarios WHERE email = ?", [email]);
     if (rows.length === 0) return res.status(401).json({ mensagem: "Credenciais inválidas" });
 
     const usuario = rows[0];
+
+    // Verifica se o usuário está ativo
+    if (usuario.status !== "ativo") {
+      return res.status(403).json({ mensagem: "Conta inativa. Contate o administrador." });
+    }
+
+    // Verifica a senha
     const senhaCorreta = await bcrypt.compare(senha, usuario.senha);
     if (!senhaCorreta) return res.status(401).json({ mensagem: "Credenciais inválidas" });
 
+    // Gera o token JWT
     const token = jwt.sign(
       { id: usuario.id, funcao: usuario.funcao, email: usuario.email },
       JWT_SECRET,
@@ -60,6 +70,7 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 // ------------------ ROTAS USUÁRIOS ------------------
 app.get("/api/usuarios", authMiddleware, async (req, res) => {

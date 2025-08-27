@@ -19,12 +19,13 @@ export default function Header() {
   }, []);
 
   // Logout
+
   const handleLogout = () => {
     localStorage.removeItem("usuarioAutenticado");
     setUsuarioAutenticado(null);
     setIsDropdownOpen(false);
     setIsMobileMenuOpen(false);
-    router.push("/");
+    router.push("/home");
   };
 
   // Nome do usuário
