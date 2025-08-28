@@ -158,7 +158,7 @@ export default function Login() {
          <br></br>
           <div className="mt-8 space-y-4">
             <div className="flex items-center justify-center space-x-2">
-              <span className="text-sm text-gray-500 font-medium"> ---------       ou         ---------</span>
+              <span className="text-sm text-gray-500 font-medium">---------       ou         ---------</span>
               
             </div>
             <br></br>
@@ -168,7 +168,7 @@ export default function Login() {
                 onClick={() => router.push('/cadastro')}
                 className="text-red-800 hover:text-red-600 font-medium transition duration-200"
               >
-                Não tem conta? Cadastre-se aqui
+                Cadastro para administradores
               </button>
 
               <br></br>
