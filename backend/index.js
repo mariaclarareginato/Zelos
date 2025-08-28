@@ -182,7 +182,7 @@ app.post("/api/chamados/assumir/:id", authMiddleware, async (req, res) => {
 });
 
 
-// atualizar chamado (e histórico)
+// atualizar usuario (e histórico)
 
 app.put("/api/usuarios/:id", authMiddleware, async (req, res) => {
   try {
@@ -223,12 +223,24 @@ app.delete("/api/usuarios/:id", authMiddleware, async (req, res) => {
 });
 
 
-// fechar chamado
-app.post("/api/chamados/:id/fechar", authMiddleware, async (req, res) => {
+// Técnicos ativos
+
+app.get("/api/usuarios", authMiddleware, async (req, res) => {
   try {
-    const { id } = req.params;
-    await db.query("UPDATE chamados SET status = 'concluído' WHERE id = ?", [id]);
-    res.json({ message: "Chamado fechado!" });
+    const { role } = req.query;
+    let query = "SELECT id, nome, email, funcao, status FROM usuarios WHERE 1=1";
+    let params = [];
+
+    if (role) {
+      query += " AND funcao = ?";
+      params.push(role);
+    }
+
+    // sempre traz só ativos
+    query += " AND status = 'ativo'";
+
+    const [rows] = await db.query(query, params);
+    res.json(rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -237,24 +249,26 @@ app.post("/api/chamados/:id/fechar", authMiddleware, async (req, res) => {
 
 
 
+// Rota para histórico de um chamado
 
-// Buscar histórico do chamado por id
-
-app.get("/api/chamados/historico/:id", (req, res) => {
+app.get("/api/chamados/:id/historico", async (req, res) => {
   const chamadoId = req.params.id;
-  const query = `
-    SELECT h.id, h.acao, u.nome AS usuario,
-           DATE_FORMAT(h.criado_em, '%Y-%m-%d %H:%i:%s') AS criado_em
-    FROM historico_chamados h
-    LEFT JOIN usuarios u ON h.usuario_id = u.id
-    WHERE h.chamado_id = ?
-    ORDER BY h.criado_em DESC
-  `;
-  db.query(query, [chamadoId], (err, results) => {
-    if (err)
-      return res.status(500).json({ error: "Erro ao buscar histórico do chamado" });
-    res.json(results);
-  });
+
+  try {
+    const [rows] = await db.execute(`
+      SELECT h.id, h.acao, u.nome AS usuario,
+             DATE_FORMAT(h.criado_em, '%Y-%m-%d %H:%i:%s') AS criado_em
+      FROM historico_chamados h
+      LEFT JOIN usuarios u ON h.usuario_id = u.id
+      WHERE h.chamado_id = ?
+      ORDER BY h.criado_em DESC
+    `, [chamadoId]);
+
+    res.json(rows);
+  } catch (err) {
+    console.error("Erro ao buscar histórico:", err);
+    res.status(500).json({ error: "Erro ao buscar histórico do chamado" });
+  }
 });
 
 
@@ -389,6 +403,9 @@ app.put("/api/chamados/:id", authMiddleware, async (req, res) => {
 
   res.json({ message: "Chamado atualizado e histórico registrado" });
 });
+
+
+
 
 
 

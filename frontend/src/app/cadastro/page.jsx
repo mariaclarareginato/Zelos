@@ -83,9 +83,16 @@ export default function Cadastro() {
             <h1 className="text-3xl font-bold text-center text-red-700 mb-3">
               Bem-vindo ao Zelos.
             </h1>
+
             <p className="text-lg text-center text-gray-500">
-              Crie conta <span className="font-semibold text-red-800">SENAI Armando de Arruda Pereira</span>
+              Crie uma conta  
             </p>
+            <span className="block text-center sm:text-left text-red-800 font-semibold text-lg sm:text-xl md:text-2xl leading-snug">
+  SENAI<br />
+  Armando de Arruda Pereira
+</span>
+
+            
           </div>
           <br></br>
 
@@ -159,7 +166,7 @@ export default function Cadastro() {
               <input
                 type="text"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-450 text-center"
-                placeholder="Digite o código fornecido para administradores"
+                placeholder="Código fornecido para adms"
                 value={codigoAdmin}
                 onChange={(e) => setCodigoAdmin(e.target.value)}
                 required

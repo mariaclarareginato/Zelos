@@ -47,7 +47,7 @@ export default function EsqueciSenha() {
       });
   
       alert(resposta.data.mensagem || "Senha atualizada com sucesso!");
-      router.push("/login");
+      router.push("/");
   
     } catch (err) {
       alert(err.response?.data?.mensagem || "Erro ao redefinir a senha.");
@@ -195,7 +195,7 @@ export default function EsqueciSenha() {
           <div className="mt-8 space-y-4">
             <div className="flex items-center justify-center space-x-2">
         
-              <span className="text-sm text-gray-500 font-medium">------------------------------          ou         ------------------------------</span>
+              <span className="text-sm text-gray-500 font-medium">---------        ou       ---------</span>
              
             </div>
             <br></br>

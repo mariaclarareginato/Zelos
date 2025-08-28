@@ -1,8 +1,11 @@
 'use client';
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-export default function PainelUsuario() {
+export default function HomeUsuario() {
+const router = useRouter();
+
   const [usuarioId, setUsuarioId] = useState(null);
   const [token, setToken] = useState(null);
   const [meusChamados, setMeusChamados] = useState([]);
@@ -12,13 +15,31 @@ export default function PainelUsuario() {
   const [mensagem, setMensagem] = useState("");
 
   // Pegar token e id do usuário do localStorage
+
+
   useEffect(() => {
     const usuario = JSON.parse(localStorage.getItem("usuarioAutenticado"));
-    if (usuario) {
-      setToken(usuario.token);
-      setUsuarioId(usuario.id);
+
+// Não logado - redireciona
+
+    if (!usuario) {
+     router.push("/");
+     return;
     }
-  }, []);
+
+    const email = usuario.email?.toLowerCase() || "";
+    const isUsuario = email.endsWith("@senaisp.com");
+
+
+    if (!isUsuario) {
+      router.push("/home");
+      return;
+    }
+
+    setToken(usuario.token);
+    setUsuarioId(Number(usuario.id));
+  }, [router]);
+
 
   // Carregar chamados do usuário
   useEffect(() => {

@@ -1,8 +1,11 @@
 'use client';
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function HomeTecnico() {
+  const router = useRouter();
+
   const [chamadosDisponiveis, setChamadosDisponiveis] = useState([]);
   const [meusChamados, setMeusChamados] = useState([]);
   const [selectedChamadoId, setSelectedChamadoId] = useState("");
@@ -18,16 +21,36 @@ export default function HomeTecnico() {
   const [fimatendimento, setFimAtendimento] = useState("");
   const [apontamentoMessage, setApontamentoMessage] = useState("");
 
+  // ---------- VERIFY LOGIN & EMAIL ----------
   useEffect(() => {
     const usuario = JSON.parse(localStorage.getItem("usuarioAutenticado"));
-    if (usuario) {
-      setToken(usuario.token);
-      setTecnicoId(Number(usuario.id));
+
+    if (!usuario) {
+      
+      // não logado → redireciona
+      router.push("/");
+      return;
     }
-  }, []);
+
+    const email = usuario.email?.toLowerCase() || "";
+    const isTecnico = email.endsWith("@tecnicosenai.com"); 
+
+    if (!isTecnico) {
+      // não técnico → redireciona
+
+      router.push("/home"); 
+      return;
+    }
+
+    // é técnico → define token e id
+    setToken(usuario.token);
+    setTecnicoId(Number(usuario.id));
+  }, [router]);
+
 
   useEffect(() => {
     if (!token || !tecnicoId) return;
+
 
     async function fetchData() {
       try {
@@ -57,7 +80,7 @@ export default function HomeTecnico() {
 
     async function fetchHistorico() {
       try {
-        const res = await fetch(`http://localhost:3005/api/chamados/historico/${selectedChamadoId}`, {
+        const res = await fetch(`http://localhost:3005/api/chamados/${selectedChamadoId}/historico`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setHistorico(await res.json());

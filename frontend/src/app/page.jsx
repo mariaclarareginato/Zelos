@@ -80,7 +80,7 @@ export default function Login() {
             <div>
               <label className="block text-sm font-medium text-gray-450 mb-1">
                 <br></br>
-                Email institucional
+                E-mail institucional
                 <br></br><br></br>
               </label>
               <div className="relative">
@@ -158,7 +158,7 @@ export default function Login() {
          <br></br>
           <div className="mt-8 space-y-4">
             <div className="flex items-center justify-center space-x-2">
-              <span className="text-sm text-gray-500 font-medium"> -----------------------------       ou         -------------------------------</span>
+              <span className="text-sm text-gray-500 font-medium"> ---------       ou         ---------</span>
               
             </div>
             <br></br>
