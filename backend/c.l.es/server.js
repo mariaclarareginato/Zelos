@@ -5,6 +5,7 @@ import mysql from "mysql2/promise";
 import bcrypt from "bcrypt"; 
 import jwt from "jsonwebtoken";
 const JWT_SECRET = "seusegredoaqui";
+import authMiddleware from '../middlewares/authMiddleware.js'
 
 const app = express();
 app.use(cors());

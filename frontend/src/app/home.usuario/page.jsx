@@ -80,43 +80,57 @@ export default function PainelUsuario() {
       <br></br><br></br>
       <h1 className="text-center text-5xl font-extrabold text-red-500 mb-12 drop-shadow-lg">Painel do Usuário</h1>
 
-      {/* Formulário Criar Chamado */}
-      <section className="mb-12">
-        <h2 className="text-3xl text-gray-200 mb-6 text-center font-semibold">Abrir Chamado</h2>
-        <form onSubmit={criarChamado} className="max-w-lg mx-auto bg-gray-700 p-6 rounded-xl shadow-xl flex flex-col space-y-4">
-          <input
-            type="text"
-            placeholder="Título"
-            value={titulo}
-            onChange={(e) => setTitulo(e.target.value)}
-            className="w-full px-4 py-2 rounded text-gray-100 bg-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500"
-          />
-          <br></br>
-          <textarea
-            placeholder="Descrição"
-            value={descricao}
-            onChange={(e) => setDescricao(e.target.value)}
-            className="w-full px-4 py-2 rounded text-gray-100 bg-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
-          />
-          <br></br>
-          <input
-            type="number"
-            placeholder="ID do tipo"
-            value={tipoId}
-            onChange={(e) => setTipoId(e.target.value)}
-            className="w-full px-4 py-2 rounded text-gray-100 bg-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500"
-          />
-          <br></br>
-          <button
-            type="submit"
-            className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded font-semibold transition duration-200"
-          >
-            Criar Chamado +
-          </button>
-          <br></br>
-          {mensagem && <p className="text-center text-red-300">{mensagem}</p>}
-        </form>
-      </section>
+{/* Formulário Criar Chamado */}
+
+<section className="mb-12 flex flex-col items-center">
+  <h2 className="text-3xl text-gray-200 mb-6 font-semibold text-center">
+    Abrir Chamado
+  </h2>
+
+  <form
+    onSubmit={criarChamado}
+    className="w-full max-w-lg bg-gray-700 p-6 rounded-xl shadow-xl flex flex-col space-y-4"
+  >
+    <input
+      type="text"
+      placeholder="Título"
+      value={titulo}
+      onChange={(e) => setTitulo(e.target.value)}
+      className="w-full px-4 py-2 rounded text-gray-100 bg-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+    />
+
+    <br></br><br></br>
+
+    <textarea
+      placeholder="Descrição"
+      value={descricao}
+      onChange={(e) => setDescricao(e.target.value)}
+      className="w-full px-4 py-2 rounded text-gray-100 bg-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+    />
+
+    <br></br><br></br>
+
+    <input
+      type="number"
+      placeholder="ID do tipo"
+      value={tipoId}
+      onChange={(e) => setTipoId(e.target.value)}
+      className="w-full px-4 py-2 rounded text-gray-100 bg-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+    />
+
+    <br></br><br></br>
+
+    <button
+      type="submit"
+      className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded font-semibold transition duration-200"
+    >
+      Criar Chamado +
+    </button>
+
+    {mensagem && <p className="text-center text-red-300">{mensagem}</p>}
+  </form>
+</section>
+
 
       {/* Lista de Chamados */}
       <section>

@@ -184,75 +184,43 @@ app.post("/api/chamados/assumir/:id", authMiddleware, async (req, res) => {
 
 // atualizar chamado (e histórico)
 
-app.put("/api/chamados/:id", (req, res) => {
-  const chamadoId = req.params.id;
-  const dadosAtualizados = req.body;
-  const usuarioId = dadosAtualizados.usuario_id;
+app.put("/api/usuarios/:id", authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nome, email, funcao, status } = req.body;
 
-  if (!usuarioId) {
-    return res.status(400).json({ error: "usuario_id é obrigatório" });
+    const [result] = await db.query(
+      "UPDATE usuarios SET nome = ?, email = ?, funcao = ?, status = ? WHERE id = ?",
+      [nome, email, funcao, status, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Usuário não encontrado" });
+    }
+
+    res.json({ message: "Usuário atualizado com sucesso!" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-
-  delete dadosAtualizados.usuario_id;
-
-  const buscarChamadoQuery = "SELECT * FROM chamados WHERE id = ?";
-  db.query(buscarChamadoQuery, [chamadoId], (err, results) => {
-    if (err) return res.status(500).json({ error: "Erro ao buscar chamado" });
-    if (results.length === 0)
-      return res.status(404).json({ error: "Chamado não encontrado" });
-
-    const chamadoAtual = results[0];
-
-    const campos = Object.keys(dadosAtualizados);
-    if (campos.length === 0)
-      return res.status(400).json({ error: "Nenhum campo para atualizar" });
-
-    const valores = campos.map((campo) => dadosAtualizados[campo]);
-    const setString = campos.map((campo) => `${campo} = ?`).join(", ");
-
-    const updateQuery = `UPDATE chamados SET ${setString} WHERE id = ?`;
-
-    db.query(updateQuery, [...valores, chamadoId], (err2) => {
-      if (err2)
-        return res.status(500).json({ error: "Erro ao atualizar chamado" });
-
-      const alteracoes = campos
-        .map((campo) => {
-          const valorAntigo = chamadoAtual[campo];
-          const valorNovo = dadosAtualizados[campo];
-          if (valorAntigo != valorNovo) {
-            return `${campo}: "${valorAntigo}" → "${valorNovo}"`;
-          }
-          return null;
-        })
-        .filter(Boolean);
-
-      if (alteracoes.length === 0) {
-        return res.json({ message: "Nenhuma alteração detectada" });
-      }
-
-      const descricao = `Alterações: ${alteracoes.join("; ")}`;
-
-      const inserirHistoricoQuery =
-        "INSERT INTO historico_chamados (chamado_id, acao, usuario_id, criado_em) VALUES (?, ?, ?, NOW())";
-      db.query(
-        inserirHistoricoQuery,
-        [chamadoId, descricao, usuarioId],
-        (err3) => {
-          if (err3) {
-            console.error(err3);
-            return res
-              .status(500)
-              .json({ error: "Erro ao registrar histórico do chamado" });
-          }
-          res.json({ message: "Chamado atualizado e histórico registrado" });
-        }
-      );
-    });
-  });
 });
 
+// Deletar usuário
 
+app.delete("/api/usuarios/:id", authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const [result] = await db.query("DELETE FROM usuarios WHERE id = ?", [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Usuário não encontrado" });
+    }
+
+    res.json({ message: "Usuário deletado com sucesso!" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 
 // fechar chamado
@@ -341,6 +309,7 @@ app.post("/api/apontamentos", authMiddleware, async (req, res) => {
 
 
 // Atualizar status do chamado (apenas técnico responsável)
+
 app.put("/api/chamados/:id/status", authMiddleware, async (req, res) => {
   try {
     const chamadoId = req.params.id;
@@ -376,6 +345,51 @@ app.put("/api/chamados/:id/status", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Erro ao atualizar status do chamado", error: err.message });
   }
 });
+
+app.put("/api/chamados/:id", authMiddleware, async (req, res) => {
+  const chamadoId = req.params.id;
+  const dadosAtualizados = req.body;
+  const usuarioId = req.user.id; // pega direto do token
+
+  const [results] = await db.query("SELECT * FROM chamados WHERE id = ?", [chamadoId]);
+  if (results.length === 0) {
+    return res.status(404).json({ error: "Chamado não encontrado" });
+  }
+
+  const chamadoAtual = results[0];
+
+  const campos = Object.keys(dadosAtualizados);
+  if (campos.length === 0) {
+    return res.status(400).json({ error: "Nenhum campo para atualizar" });
+  }
+
+  const valores = campos.map((campo) => dadosAtualizados[campo]);
+  const setString = campos.map((campo) => `${campo} = ?`).join(", ");
+
+  await db.query(`UPDATE chamados SET ${setString} WHERE id = ?`, [...valores, chamadoId]);
+
+  const alteracoes = campos
+    .map((campo) => {
+      const valorAntigo = chamadoAtual[campo];
+      const valorNovo = dadosAtualizados[campo];
+      if (valorAntigo != valorNovo) {
+        return `${campo}: "${valorAntigo}" → "${valorNovo}"`;
+      }
+      return null;
+    })
+    .filter(Boolean);
+
+  if (alteracoes.length > 0) {
+    const descricao = `Alterações: ${alteracoes.join("; ")}`;
+    await db.query(
+      "INSERT INTO historico_chamados (chamado_id, acao, usuario_id, criado_em) VALUES (?, ?, ?, NOW())",
+      [chamadoId, descricao, usuarioId]
+    );
+  }
+
+  res.json({ message: "Chamado atualizado e histórico registrado" });
+});
+
 
 
 // ------------------ Start Server ------------------

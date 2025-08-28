@@ -6,32 +6,42 @@ import { useRouter } from "next/navigation";
 
 export default function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [usuarioAutenticado, setUsuarioAutenticado] = useState(null);
+  const [usuario, setUsuario] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
 
-  // Pega usuário do localStorage
   useEffect(() => {
     const dados = localStorage.getItem("usuarioAutenticado");
     if (dados) {
-      setUsuarioAutenticado(JSON.parse(dados));
+      setUsuario(JSON.parse(dados));
     }
   }, []);
 
-  // Logout
+  const handleClick = () => {
+    if (!usuario) return;
+
+    if (usuario.email.endsWith("@administradorsenai.com")) {
+      router.push("/home.admin");
+    } else if (usuario.email.endsWith("@tecnicosenai.com")) {
+      router.push("/home.tecnico");
+    } else if (usuario.email.endsWith("@senaisp.com")) {
+      router.push("/home.usuario");
+    } else {
+      router.push("/home");
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("usuarioAutenticado");
-    setUsuarioAutenticado(null);
+    setUsuario(null);
     setIsDropdownOpen(false);
     setIsMobileMenuOpen(false);
     router.push("/home");
   };
 
-  // Nome do usuário
   const getNomeUsuario = () => {
-    if (!usuarioAutenticado) return "";
-    return usuarioAutenticado.nome || usuarioAutenticado.email?.split("@")[0] || "";
+    if (!usuario) return "";
+    return usuario.nome || usuario.email?.split("@")[0] || "";
   };
 
   return (
@@ -43,7 +53,8 @@ export default function Header() {
             <img
               src="imgs/logo.png"
               alt="Logo SENAI"
-              className="h-10 w-auto object-contain"
+              className="h-10 w-auto object-contain cursor-pointer"
+              onClick={handleClick}
             />
             <p className="text-lg sm:text-2xl font-bold text-gray-400 leading-tight hover:text-gray-500">
               Armando de Arruda Pereira
@@ -51,9 +62,8 @@ export default function Header() {
           </div>
 
           {/* Menu Desktop */}
-
           <div className="hidden md:flex items-center gap-4">
-            {usuarioAutenticado ? (
+            {usuario ? (
               <div className="relative">
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -133,10 +143,9 @@ export default function Header() {
       </div>
 
       {/* Menu Mobile */}
-
       {isMobileMenuOpen && (
         <div className="md:hidden px-4 pb-4 space-y-2">
-          {usuarioAutenticado ? (
+          {usuario ? (
             <>
               <div className="text-center font-semibold py-2 text-gray-400">
                 Olá, {getNomeUsuario()}

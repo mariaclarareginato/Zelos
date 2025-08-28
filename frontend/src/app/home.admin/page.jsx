@@ -125,7 +125,87 @@ export default function HomeAdmin() {
     <main className="min-h-screen bg-gray-900 p-6">
       <h1 className="text-5xl font-extrabold text-red-500 text-center mb-12 drop-shadow-lg">Painel do Administrador</h1>
 
-      {mensagem && <p className="text-center text-green-400 mb-4">{mensagem}</p>}
+      {mensagem && <p className="text-center text-red-400 mb-4">{mensagem}</p>}
+
+       {/* --------- CHAMADOS --------- */}
+      <section className="mb-12">
+        <h2 className="text-3xl text-gray-200 mb-6 text-center font-semibold">Chamados</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full text-gray-200 bg-gray-800 rounded-lg overflow-hidden">
+            <thead className="bg-gray-700">
+              <tr>
+                <th className="p-3">Título</th>
+                <th>Descrição</th>
+                <th>Status</th>
+                <th>Técnico</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {chamados.map(c => (
+                <tr key={c.id} className="border-b border-gray-700">
+                  <td className="p-2">
+                    {editChamado?.id === c.id ? (
+                      <input
+                        className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+                        value={editChamado.titulo}
+                        onChange={e => setEditChamado({ ...editChamado, titulo: e.target.value })}
+                      />
+                    ) : c.titulo}
+                  </td>
+                  <td className="p-2">
+                    {editChamado?.id === c.id ? (
+                      <textarea
+                        className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+                        value={editChamado.descricao}
+                        onChange={e => setEditChamado({ ...editChamado, descricao: e.target.value })}
+                      />
+                    ) : c.descricao}
+                  </td>
+                  <td className="p-2">
+                    {editChamado?.id === c.id ? (
+                      <select
+                        className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+                        value={editChamado.status}
+                        onChange={e => setEditChamado({ ...editChamado, status: e.target.value })}
+                      >
+                        <option value="pendente">Pendente</option>
+                        <option value="em andamento">Em andamento</option>
+                        <option value="concluído">Concluído</option>
+                      </select>
+                    ) : c.status}
+                  </td>
+                  <td className="p-2">
+                    {editChamado?.id === c.id ? (
+                      <input
+                        type="number"
+                        className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+                        value={editChamado.tecnico_id || ""}
+                        onChange={e => setEditChamado({ ...editChamado, tecnico_id: Number(e.target.value) })}
+                      />
+                    ) : c.tecnico || "-"}
+                  </td>
+                  <td className="p-2 space-x-2">
+                    {editChamado?.id === c.id ? (
+                      <>
+                        <button onClick={atualizarChamado} className="bg-red-500 px-3 py-1 rounded hover:bg-red-600">Salvar</button>
+                        <br></br><br></br>
+                        <button onClick={() => setEditChamado(null)} className="bg-gray-500 px-3 py-1 rounded hover:bg-gray-600">Cancelar</button>
+                      </>
+                    ) : (
+                      <>
+                        <button onClick={() => setEditChamado(c)} className="bg-red-900 px-3 py-1 rounded hover:bg-red-800">Editar</button>
+                        <br></br><br></br>
+                        <button onClick={() => deletarChamado(c.id)} className="bg-red-500 px-3 py-1 rounded hover:bg-red-600">Deletar</button>
+                      </>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       {/* --------- USUÁRIOS --------- */}
       <section className="mb-12">
@@ -190,12 +270,14 @@ export default function HomeAdmin() {
                   <td className="p-2 space-x-2">
                     {editUsuario?.id === u.id ? (
                       <>
-                        <button onClick={atualizarUsuario} className="bg-green-500 px-3 py-1 rounded hover:bg-green-600">Salvar</button>
+                        <button onClick={atualizarUsuario} className="bg-red-500 px-3 py-1 rounded hover:bg-red-600">Salvar</button>
+                        <br></br><br></br>
                         <button onClick={() => setEditUsuario(null)} className="bg-gray-500 px-3 py-1 rounded hover:bg-gray-600">Cancelar</button>
                       </>
                     ) : (
                       <>
-                        <button onClick={() => setEditUsuario(u)} className="bg-blue-500 px-3 py-1 rounded hover:bg-blue-600">Editar</button>
+                        <button onClick={() => setEditUsuario(u)} className="bg-red-900 px-3 py-1 rounded hover:bg-red-800">Editar</button>
+                         <br></br><br></br>
                         <button onClick={() => deletarUsuario(u.id)} className="bg-red-500 px-3 py-1 rounded hover:bg-red-600">Deletar</button>
                       </>
                     )}
@@ -207,83 +289,7 @@ export default function HomeAdmin() {
         </div>
       </section>
 
-      {/* --------- CHAMADOS --------- */}
-      <section className="mb-12">
-        <h2 className="text-3xl text-gray-200 mb-6 text-center font-semibold">Chamados</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-gray-200 bg-gray-800 rounded-lg overflow-hidden">
-            <thead className="bg-gray-700">
-              <tr>
-                <th className="p-3">Título</th>
-                <th>Descrição</th>
-                <th>Status</th>
-                <th>Técnico</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {chamados.map(c => (
-                <tr key={c.id} className="border-b border-gray-700">
-                  <td className="p-2">
-                    {editChamado?.id === c.id ? (
-                      <input
-                        className="p-1 bg-gray-600 text-gray-100 rounded w-full"
-                        value={editChamado.titulo}
-                        onChange={e => setEditChamado({ ...editChamado, titulo: e.target.value })}
-                      />
-                    ) : c.titulo}
-                  </td>
-                  <td className="p-2">
-                    {editChamado?.id === c.id ? (
-                      <textarea
-                        className="p-1 bg-gray-600 text-gray-100 rounded w-full"
-                        value={editChamado.descricao}
-                        onChange={e => setEditChamado({ ...editChamado, descricao: e.target.value })}
-                      />
-                    ) : c.descricao}
-                  </td>
-                  <td className="p-2">
-                    {editChamado?.id === c.id ? (
-                      <select
-                        className="p-1 bg-gray-600 text-gray-100 rounded w-full"
-                        value={editChamado.status}
-                        onChange={e => setEditChamado({ ...editChamado, status: e.target.value })}
-                      >
-                        <option value="pendente">Pendente</option>
-                        <option value="em andamento">Em andamento</option>
-                        <option value="concluído">Concluído</option>
-                      </select>
-                    ) : c.status}
-                  </td>
-                  <td className="p-2">
-                    {editChamado?.id === c.id ? (
-                      <input
-                        type="number"
-                        className="p-1 bg-gray-600 text-gray-100 rounded w-full"
-                        value={editChamado.tecnico_id || ""}
-                        onChange={e => setEditChamado({ ...editChamado, tecnico_id: Number(e.target.value) })}
-                      />
-                    ) : c.tecnico || "-"}
-                  </td>
-                  <td className="p-2 space-x-2">
-                    {editChamado?.id === c.id ? (
-                      <>
-                        <button onClick={atualizarChamado} className="bg-green-500 px-3 py-1 rounded hover:bg-green-600">Salvar</button>
-                        <button onClick={() => setEditChamado(null)} className="bg-gray-500 px-3 py-1 rounded hover:bg-gray-600">Cancelar</button>
-                      </>
-                    ) : (
-                      <>
-                        <button onClick={() => setEditChamado(c)} className="bg-blue-500 px-3 py-1 rounded hover:bg-blue-600">Editar</button>
-                        <button onClick={() => deletarChamado(c.id)} className="bg-red-500 px-3 py-1 rounded hover:bg-red-600">Deletar</button>
-                      </>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
+     
     </main>
   );
 }
