@@ -1,7 +1,9 @@
 export default function NotFound() {
     return (
       <div className="relative min-h-screen flex flex-col items-center justify-center text-white overflow-hidden">
+
         {/* Vídeo de fundo */}
+        
         <video
           autoPlay
           muted
@@ -13,13 +15,16 @@ export default function NotFound() {
           Seu navegador não suporta vídeos em HTML5.
         </video>
   
-        {/* Camada de overlay escura para contraste */}
+        {/* Contraste */}
+
         <div className="absolute inset-0 bg-black/60"></div>
   
-        {/* Bolha animada por cima do vídeo */}
+        {/* Animação por cima do vídeo */}
+
         <div className="absolute w-[600px] h-[600px] rounded-full bg-red-500/30 blur-3xl animate-pulse"></div>
   
         {/* Conteúdo */}
+
         <h1 className="text-[8rem] font-extrabold drop-shadow-lg z-10 animate-bounce">
           404
         </h1>

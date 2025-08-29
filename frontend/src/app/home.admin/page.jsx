@@ -1,5 +1,7 @@
 'use client';
 
+// Importações
+
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -23,7 +25,8 @@ export default function HomeAdmin() {
     const usuario = JSON.parse(localStorage.getItem("usuarioAutenticado"));
 
     if (!usuario) {
-      // não logado → redireciona para login
+
+      // não logado → redireciona login
       
       router.push("/");
       return;
@@ -36,6 +39,7 @@ export default function HomeAdmin() {
 
     if (!isAdmin) {
       // não admin → redireciona
+
       router.push("/home");
       return;
     }
@@ -43,6 +47,7 @@ export default function HomeAdmin() {
   
 
   // ---------- FETCH EFFECT ----------
+
   useEffect(() => {
     if (!token) return;
     fetchUsuarios();
@@ -97,6 +102,7 @@ export default function HomeAdmin() {
   };
 
   // ---------- USUÁRIOS ----------
+
   const atualizarUsuario = async () => {
     if (!editUsuario) return;
 
@@ -137,6 +143,7 @@ export default function HomeAdmin() {
   };
 
   // ---------- CHAMADOS ----------
+
   const atualizarChamado = async () => {
     if (!editChamado) return;
     const { id, titulo, descricao, status, tecnico_id, usuario_id } = editChamado;
@@ -174,7 +181,8 @@ export default function HomeAdmin() {
     }
   };
 
-  // ---------- RENDER ----------
+  
+
   return (
     <main className="min-h-screen bg-gray-900 p-4 md:p-6">
       <h1 className="text-3xl md:text-5xl font-extrabold text-red-500 text-center mb-8 drop-shadow-lg">
@@ -344,6 +352,8 @@ export default function HomeAdmin() {
           ))}
         </div>
       </section>
+
+      
 
       {/* ---------------- USUÁRIOS ---------------- */}
       <section className="mb-12 gap-10">

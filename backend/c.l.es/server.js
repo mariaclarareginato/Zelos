@@ -1,4 +1,6 @@
-// server.js
+
+// Importações
+
 import express from "express";
 import cors from "cors";
 import mysql from "mysql2/promise";
@@ -6,6 +8,8 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 const JWT_SECRET = "seusegredoaqui";
 import authMiddleware from '../middlewares/authMiddleware.js'
+
+// Usando cors, json e express
 
 const app = express();
 app.use(cors());
@@ -48,7 +52,12 @@ app.post('/cadastro', async (req, res) => {
   });
 
 
-  // ===================== ESQUECI SENHA =====================
+
+
+
+
+
+  // Esqueci senha
 
 app.post("/api/esquecisenha", async (req, res) => {
   const { email, novaSenha } = req.body;
@@ -76,6 +85,7 @@ app.post("/api/esquecisenha", async (req, res) => {
 
 
 // Atualizar status do chamado (apenas técnico responsável)
+
 app.put("/api/chamados/:id/status", authMiddleware, async (req, res) => {
   try {
     const chamadoId = req.params.id;
@@ -113,7 +123,8 @@ app.put("/api/chamados/:id/status", authMiddleware, async (req, res) => {
 });
 
 
-// Subir servidor
+// Iniciar servidor
+
 const PORT = 3004;
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
@@ -123,15 +134,3 @@ app.listen(PORT, () => {
 
 
 
-// ('Nicolas de Lima', 123, 'nicolas@administradorsenai.com', 'Administrador', 'ativo'),
-// ('Pedro Vasconcelos', 456, 'pedro@administradorsenai.com', 'Administrador', 'ativo'), 
-//('Sara Limeira', 789, 'sara@administradorsenai.com', 'Administrador', 'inativo'), 
-//('Felipe Casaquera', 001, 'felipe@administradorsenai.com', 'Administrador', 'inativo'), 
-//('João Carvalho', 012, 'joao@tecnicosenai.com', 'Técnico', 'ativo'), 
-//('Fernando Manhasi', 013, 'fernando@tecnicosenai.com', 'Técnico', 'ativo'), 
-//('Ricardo Espanha', 014, 'ricardo@tecnicosenai.com', 'Técnico', 'ativo'), 
-//('Nicoli Castilho', 015, 'nicoli@tecnicosenai.com', 'Técnico', 'inativo'), 
-//('Carlos Ferreira', 016, 'carlos@senaisp.com', 'Usuário', 'ativo'), 
-//('Bruno Leite Farias', 017, 'bruno@senaisp.com', 'Usuário', 'ativo'), 
-//('Gabriele Oliveira', 135, 'gabi@senaisp.com', 'Usuário', 'inativo'), 
-//('Pedro Camões', 134, 'pedro@senaisp.com', 'Usuário', 'inativo');

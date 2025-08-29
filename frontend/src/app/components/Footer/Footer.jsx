@@ -1,3 +1,5 @@
+// Importações
+
 import Link from "next/link";
 import React from "react";
 import { FaInstagram, FaLinkedin, FaXTwitter } from "react-icons/fa6"; 
@@ -38,12 +40,13 @@ const Footer = () => {
                   rel="noopener noreferrer"
                   className="hover:text-gray-400 transition"
                 >
-                  <FaXTwitter size={42} /> {/* Ícone novo do X */}
+                  <FaXTwitter size={42} /> 
                 </a>
               </div>
             </div>
 
             {/* Coluna */}
+
             <div className="min-w-[150px]">
               <h4 className="font-semibold mb-3 text-gray-400">Sobre</h4>
               <ul className="space-y-2 text-sm text-gray-400">

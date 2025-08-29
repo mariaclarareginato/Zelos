@@ -21,16 +21,16 @@ export default function Login() {
   try {
     const resposta = await axios.post('http://localhost:3005/login', { email, senha });
     
-    // desestrutura os dados vindos do backend
+    // Desestrutura os dados vindos do backend
     const { token, id, nome, email: usuarioEmail } = resposta.data;
 
-    // salva o objeto inteiro no localStorage
+    // Salva o objeto inteiro no localStorage
     localStorage.setItem(
       'usuarioAutenticado',
       JSON.stringify({ id, nome, email: usuarioEmail, token })
     );
 
-    // redireciona baseado no email
+    // Redireciona baseado no email
     if (usuarioEmail.endsWith('@administradorsenai.com')) {
       router.push('/home.admin');
     } else if (usuarioEmail.endsWith('@tecnicosenai.com')) {
@@ -51,7 +51,7 @@ export default function Login() {
 
     
 
-  // Formulário
+// Formulário
 
   return (
     <div className="relative min-h-screen">
@@ -154,6 +154,8 @@ export default function Login() {
               </svg>
             </button>
           </form>
+
+          {/* Links para outras páginas */}
 
          <br></br>
           <div className="mt-8 space-y-4">

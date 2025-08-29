@@ -1,9 +1,9 @@
 "use client";
 
-
+// Importações 
 
 import { usePathname } from "next/navigation";
-import Header from "./components/Header/Header.jsx";
+import Header from "./components/Header/Header.jsx"; 
 import { useState, useEffect } from "react";
 
 export default function HeaderWrapper() {
@@ -14,7 +14,7 @@ export default function HeaderWrapper() {
     setMounted(true);
   }, []);
 
-  if (!mounted) return null; // Evita HTML diferente no SSR
+  if (!mounted) return null; 
 
 
   // Escondendo Header de todas as páginas menos essas

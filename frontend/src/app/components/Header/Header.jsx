@@ -1,5 +1,7 @@
 'use client';
 
+// Importações
+
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -39,6 +41,7 @@ export default function Header() {
     <nav className="bg-red-950 text-gray-400 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
+          
           {/* Logo + Nome */}
           <div className="flex items-center gap-4">
             <img

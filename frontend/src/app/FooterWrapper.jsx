@@ -1,5 +1,7 @@
 "use client";
 
+// Importações
+
 import { usePathname } from "next/navigation";
 import Footer from './components/Footer/Footer.jsx';
 import { useState, useEffect } from "react";
@@ -12,10 +14,10 @@ export default function FooterWrapper() {
     setMounted(true);
   }, []);
 
-  if (!mounted) return null; // Evita HTML diferente no SSR
+  if (!mounted) return null; 
 
 
-  // Escondendo Header de todas as páginas menos essas
+  // Escondendo Footer de todas as páginas menos essas
 
   const showLayout = (
     pathname.startsWith("/home.admin") ||

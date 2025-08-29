@@ -1,15 +1,25 @@
+// Importação
+
 import React from "react";
 
 const Contato = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 drop-shadow-[0_10px_25px_rgba(220,38,38,0.5)]">
       <div className="bg-black rounded-2xl shadow-lg px-14 py-16 w-full max-w-2xl">
+
+        {/* Título */}
+
         <h1 className="text-3xl font-bold text-center mb-8 text-gray-400">
           Precisa de ajuda?
         </h1>
+
+        {/* Descrição */}
+
         <h2 className="text-lg text-center mb-12 opacity-90 text-gray-400">
           Quer mandar alguma mensagem para nós?
         </h2>
+
+         {/* Formulário */}
 
         <form className="form-contato flex flex-col gap-8">
           <label className="flex flex-col font-medium text-base text-gray-400">

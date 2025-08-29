@@ -1,5 +1,7 @@
 'use client';
 
+// Importações
+
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
@@ -55,7 +57,7 @@ export default function Cadastro() {
     if (senha !== csenha) { alert('As senhas não coincidem.'); return; }
 
     // Validação do código de admin
-    if (codigoAdmin !== 'ADM-2025-SENAI') {
+    if (codigoAdmin !== 'ADM-2025-SENAI') { // SUPER SECRETO
       alert('Código de administrador inválido.');
       return;
     }
@@ -65,7 +67,7 @@ export default function Cadastro() {
         cpf: cpf.replace(/[^\d]/g, ''),
         email,
         senha,
-        funcao: 'Administrador' // garante que será cadastrado como admin
+        funcao: 'Administrador' // Garante que só admin logue
       });
       alert(res.data.mensagem);
       router.push('/');
@@ -97,6 +99,7 @@ export default function Cadastro() {
           <br></br>
 
           <form className="space-y-6" onSubmit={cadastrar}>
+
             {/* CPF */}
             <div>
               <label className="block text-sm font-medium text-gray-450 mb-1">CPF</label>

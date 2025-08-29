@@ -1,5 +1,7 @@
 'use client';
 
+// Importações
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -20,7 +22,7 @@ const router = useRouter();
   useEffect(() => {
     const usuario = JSON.parse(localStorage.getItem("usuarioAutenticado"));
 
-// Não logado - redireciona
+// Não logado - redireciona login
 
     if (!usuario) {
      router.push("/");
@@ -42,6 +44,7 @@ const router = useRouter();
 
 
   // Carregar chamados do usuário
+
   useEffect(() => {
     if (!usuarioId || !token) return;
 
@@ -61,6 +64,7 @@ const router = useRouter();
   }, [usuarioId, token]);
 
   // Criar chamado
+
   async function criarChamado(e) {
     e.preventDefault();
     if (!titulo || !descricao || !tipoId) {
@@ -83,6 +87,7 @@ const router = useRouter();
         setTipoId("");
 
         // Atualizar lista
+
         const resChamados = await fetch(`http://localhost:3005/api/chamados/meus-chamados/${usuarioId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -154,6 +159,7 @@ const router = useRouter();
 
 
       {/* Lista de Chamados */}
+
       <section>
         <h2 className="text-3xl text-gray-200 mb-6 text-center font-semibold">Seus Chamados</h2>
         {meusChamados.length === 0 ? (

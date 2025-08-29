@@ -1,3 +1,5 @@
+// Importações
+
 import React from "react";
 import Image from "next/image";
  
@@ -7,11 +9,17 @@ const NossaHistoria = () => {
       <div className="w-full max-w-5xl px-6 text-center">
  
         <br />
+
+        {/* Título */}
+
         <h3 className="text-3xl font-bold text-red-800 mb-6">
           História da Escola SENAI Armando de Arruda Pereira
         </h3>
  
 <br />
+
+         {/* Texto */}
+
         <p className="mb-4 text-gray-400">
           A <strong>Escola SENAI Armando de Arruda Pereira</strong> foi concebida
           como a primeira unidade da instituição voltada à{" "}
@@ -62,6 +70,8 @@ const NossaHistoria = () => {
         </ul>
 <br />
        
+         {/* Imagem */}
+
 <div className="mt-8 flex justify-center">
   <Image src='/imgs/senai.png' alt="Escola SENAI Armando de Arruda Pereira" width={800} height={450} className="rounded-lg drop-shadow-[0_10px_25px_rgba(220,38,38,0.5)]" />
 </div>

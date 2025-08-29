@@ -1,14 +1,19 @@
+// Importações
+
 import express from "express";
 import mysql from "mysql2/promise";
 import cors from "cors";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
+// Usando express, json e cors
+
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Config banco
+// Conexão b.d
+
 const db = mysql.createPool({
   host: "localhost",
   user: "root",
@@ -19,6 +24,7 @@ const db = mysql.createPool({
 const JWT_SECRET = "segredo_super_secreto";
 
 // ------------------ Middleware de autenticação ------------------
+
 function authMiddleware(req, res, next) {
   const authHeader = req.headers["authorization"];
   if (!authHeader) return res.status(401).json({ mensagem: "Token não fornecido" });
@@ -73,6 +79,7 @@ app.post("/login", async (req, res) => {
 
 
 // ------------------ ROTAS USUÁRIOS ------------------
+
 app.get("/api/usuarios", authMiddleware, async (req, res) => {
   try {
     const { role } = req.query;
@@ -93,7 +100,9 @@ app.get("/api/usuarios", authMiddleware, async (req, res) => {
 
 // ------------------ ROTAS CHAMADOS ------------------
 
-// criar chamado (usuário)
+
+// Criar chamado (usuário)
+
 app.post("/api/chamados/novo", authMiddleware, async (req, res) => {
   try {
     const { titulo, descricao, tipo_id, usuario_id } = req.body;
@@ -109,7 +118,8 @@ app.post("/api/chamados/novo", authMiddleware, async (req, res) => {
   }
 });
 
-// todos chamados (admin)
+// Todos chamados (admin)
+
 app.get("/api/chamados", authMiddleware, async (req, res) => {
   try {
     const [rows] = await db.query(
@@ -126,7 +136,8 @@ app.get("/api/chamados", authMiddleware, async (req, res) => {
   }
 });
 
-// chamados de um usuário
+// Chamados de um usuário
+
 app.get("/api/chamados/meus-chamados/:usuarioId", authMiddleware, async (req, res) => {
   try {
     const { usuarioId } = req.params;
@@ -143,7 +154,8 @@ app.get("/api/chamados/meus-chamados/:usuarioId", authMiddleware, async (req, re
   }
 });
 
-// chamados disponíveis (sem técnico)
+// Chamados disponíveis (sem técnico)
+
 app.get("/api/chamados/disponiveis", authMiddleware, async (req, res) => {
   try {
     const [rows] = await db.query("SELECT * FROM chamados WHERE tecnico_id IS NULL AND status = 'pendente'");
@@ -153,7 +165,8 @@ app.get("/api/chamados/disponiveis", authMiddleware, async (req, res) => {
   }
 });
 
-// chamados de um técnico
+// Chamados de um técnico
+
 app.get("/api/chamados/tecnico/:id", authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
@@ -164,7 +177,8 @@ app.get("/api/chamados/tecnico/:id", authMiddleware, async (req, res) => {
   }
 });
 
-// assumir chamado
+// Assumir chamado
+
 app.post("/api/chamados/assumir/:id", authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
@@ -182,7 +196,7 @@ app.post("/api/chamados/assumir/:id", authMiddleware, async (req, res) => {
 });
 
 
-// atualizar usuario (e histórico)
+// Atualizar usuario (e histórico)
 
 app.put("/api/usuarios/:id", authMiddleware, async (req, res) => {
   try {
@@ -236,7 +250,7 @@ app.get("/api/usuarios", authMiddleware, async (req, res) => {
       params.push(role);
     }
 
-    // sempre traz só ativos
+    // Sempre traz só ativos
     query += " AND status = 'ativo'";
 
     const [rows] = await db.query(query, params);
@@ -363,7 +377,7 @@ app.put("/api/chamados/:id/status", authMiddleware, async (req, res) => {
 app.put("/api/chamados/:id", authMiddleware, async (req, res) => {
   const chamadoId = req.params.id;
   const dadosAtualizados = req.body;
-  const usuarioId = req.user.id; // pega direto do token
+  const usuarioId = req.user.id; // Pega direto do token
 
   const [results] = await db.query("SELECT * FROM chamados WHERE id = ?", [chamadoId]);
   if (results.length === 0) {
@@ -406,10 +420,8 @@ app.put("/api/chamados/:id", authMiddleware, async (req, res) => {
 
 
 
+// ------------------  Iniciar servidor ------------------
 
-
-
-// ------------------ Start Server ------------------
 app.listen(3005, () => {
   console.log("Servidor rodando na porta 3005");
 });

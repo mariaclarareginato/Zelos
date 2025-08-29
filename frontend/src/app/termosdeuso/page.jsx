@@ -1,3 +1,5 @@
+// Importações
+
 import React from "react";
 
  
@@ -7,11 +9,16 @@ const TermosDeUso = () => {
         <div className="w-full max-w-5xl px-6 ">
  
           <br />
+
+        {/* Título */}
+
           <h3 className="text-3xl font-bold text-red-800 mb-6">
           Termos de Uso
           </h3>
  
   <br />
+
+        {/* Lista/texto */}
      
       <h2 className="text-2xl font-semibold text-red-700 mt-6 mb-3">
            1. Uso do Site

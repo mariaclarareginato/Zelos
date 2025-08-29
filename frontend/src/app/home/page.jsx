@@ -1,13 +1,19 @@
 "use client";
+
+// Importações
+
 import React from "react";
 import { useRouter } from 'next/navigation';
  
+
+
 export default function Home() {
     const router = useRouter();
     
   return (
     <div className="relative w-full h-screen overflow-hidden">
       {/* Vídeo de fundo */}
+
       <video
         autoPlay
         muted
@@ -22,7 +28,8 @@ export default function Home() {
    
       <div className="absolute inset-0 bg-black/40" />
  
-      {/* Página */}
+      {/* Botões */}
+
       <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-gray-400">
         <h1 className="text-3xl font-bold mb-20">Logue com seu e-mail institucional, se não tiver um entre em contato
         </h1>

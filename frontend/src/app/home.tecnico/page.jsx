@@ -1,5 +1,7 @@
 'use client';
 
+// Importações
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -21,13 +23,14 @@ export default function HomeTecnico() {
   const [fimatendimento, setFimAtendimento] = useState("");
   const [apontamentoMessage, setApontamentoMessage] = useState("");
 
-  // ---------- VERIFY LOGIN & EMAIL ----------
+  // ---------- VERIFICAÇÃO LOGIN & EMAIL ----------
+
   useEffect(() => {
     const usuario = JSON.parse(localStorage.getItem("usuarioAutenticado"));
 
     if (!usuario) {
       
-      // não logado → redireciona
+      // não logado → redireciona login
       router.push("/");
       return;
     }
@@ -36,6 +39,7 @@ export default function HomeTecnico() {
     const isTecnico = email.endsWith("@tecnicosenai.com"); 
 
     if (!isTecnico) {
+
       // não técnico → redireciona
 
       router.push("/home"); 
@@ -43,6 +47,7 @@ export default function HomeTecnico() {
     }
 
     // é técnico → define token e id
+
     setToken(usuario.token);
     setTecnicoId(Number(usuario.id));
   }, [router]);
@@ -51,6 +56,7 @@ export default function HomeTecnico() {
   useEffect(() => {
     if (!token || !tecnicoId) return;
 
+// FETCH DATA
 
     async function fetchData() {
       try {
@@ -223,6 +229,7 @@ export default function HomeTecnico() {
 
         {selectedChamadoId && (
           <div className="bg-gray-700 p-6 rounded-xl shadow-xl space-y-6">
+
             {/* Atualizar Status */}
             <div className="flex flex-col md:flex-row items-center gap-4">
               <label className="text-gray-200 font-semibold">Status:</label>

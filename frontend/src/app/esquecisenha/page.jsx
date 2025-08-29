@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 
 
 
-// Funcionalidade (Verificação se email é institucional e confirmação/redefinição de senha) 
+// Funcionalidade (Verificação se email é institucional para confirmação/redefinição de senha) 
 
 export default function EsqueciSenha() {
 
@@ -194,6 +194,9 @@ export default function EsqueciSenha() {
           <br></br>
           <div className="mt-8 space-y-4">
             <div className="flex items-center justify-center space-x-2">
+
+
+            {/*Formulário*/}
         
               <span className="text-sm text-gray-500 font-medium">---------        ou       ---------</span>
              
