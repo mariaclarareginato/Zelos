@@ -4,6 +4,8 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import jsPDF from "jspdf";
+
 
 export default function HomeAdmin() {
   const router = useRouter();
@@ -55,7 +57,10 @@ export default function HomeAdmin() {
     fetchTecnicos();
   }, [token]);
 
-  // ---------- FETCH FUNCTIONS ----------
+  // ---------- FETCH FUNÇÕES ----------
+
+  // Usuários
+
   const fetchUsuarios = async () => {
     try {
       const res = await fetch("http://localhost:3005/api/usuarios", {
@@ -66,6 +71,8 @@ export default function HomeAdmin() {
       console.error(err);
     }
   };
+
+  // Chamados
 
   const fetchChamados = async () => {
     try {
@@ -78,6 +85,8 @@ export default function HomeAdmin() {
     }
   };
 
+  // Técnicos
+
   const fetchTecnicos = async () => {
     try {
       const res = await fetch("http://localhost:3005/api/usuarios?role=tecnico", {
@@ -88,6 +97,8 @@ export default function HomeAdmin() {
       console.error(err);
     }
   };
+
+  // Histórico
 
   const fetchHistorico = async (chamadoId) => {
     try {
@@ -101,6 +112,95 @@ export default function HomeAdmin() {
     }
   };
 
+  // PDF
+
+  const gerarRelatorioChamadopdf = (chamado, historicoChamado) => {
+    const pdf = new jsPDF();
+    const img = new Image();
+    img.src = '/imgs/logo.png';
+  
+    img.onload = () => {
+      let startY = 20;
+  
+     
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(14);
+      pdf.text("Relatório do Chamado:", 14, startY);
+  
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(11);
+      startY = 35;
+  
+     
+      const linesID = pdf.splitTextToSize(`ID: ${chamado.id}`, 180);
+      const linesTitulo = pdf.splitTextToSize(`Título: ${chamado.titulo}`, 180);
+      const linesDescricao = pdf.splitTextToSize(`Descrição: ${chamado.descricao}`, 180);
+      const linesStatus = pdf.splitTextToSize(`Status: ${chamado.status}`, 180);
+      const linesTecnico = pdf.splitTextToSize(`Técnico: ${chamado.tecnico}`, 180);
+  
+      [linesID, linesTitulo, linesDescricao, linesStatus, linesTecnico].forEach(lines => {
+        lines.forEach(line => {
+          pdf.text(line, 14, startY);
+          startY += 6;
+        });
+        startY += 2;
+      });
+  
+      
+      pdf.addImage(img, "PNG", 160, 10, 40, 10);
+  
+    
+      startY += 5;
+      pdf.setDrawColor(0);
+      pdf.setLineWidth(0.3);
+      pdf.line(14, startY, 200, startY);
+      startY += 10;
+  
+     
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(14);
+      pdf.text("Histórico do Chamado:", 14, startY);
+      startY += 8;
+  
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(11);
+  
+      if (historicoChamado && historicoChamado.length > 0) {
+        historicoChamado.forEach(h => {
+       
+          const linesUsuario = pdf.splitTextToSize(`Usuário: ${h.usuario}`, 180);
+  
+          const linesAcao = pdf.splitTextToSize(`Ação: ${h.acao}`, 100);
+         
+          const linesData = pdf.splitTextToSize(`Data: ${h.criado_em}`, 180);
+          
+  
+          [linesUsuario, linesAcao, linesData].forEach(lines => {
+            lines.forEach(line => {
+              pdf.text(line, 14, startY);
+              startY += 6; 
+            });
+            startY += 2; 
+          });
+  
+         
+
+          pdf.setDrawColor(150);
+          pdf.setLineWidth(0.2);
+          pdf.line(14, startY, 200, startY);
+          startY += 6;
+        });
+      } else {
+        pdf.text("Sem histórico disponível para esse chamado.", 14, startY, { maxWidth: 180 });
+      }
+  
+      
+      pdf.save(`chamado_${chamado.id}.pdf`);
+    };
+  };
+  
+  
   // ---------- USUÁRIOS ----------
 
   const atualizarUsuario = async () => {
@@ -284,29 +384,63 @@ export default function HomeAdmin() {
                           >
                             Histórico
                           </button>
+
+                          {/* Gerar PDF */} 
+
+                          <button
+                          onClick={() => {
+                            if (!historico[c.id]) {
+                              fetchHistorico(c.id).then(() => {
+                                gerarRelatorioChamadopdf(c, historico[c.id] || []);
+                              });
+                            } else {
+                              gerarRelatorioChamadopdf(c, historico[c.id]);
+                            }
+                          }}
+                          className="bg-red-500 px-3 py-1 rounded hover:bg-red-700"
+                          >Gerar PDF</button>
                         </>
                       )}
                     </td>
                   </tr>
 
                   {/* Histórico */}
+
                   {historicoAberto[c.id] && (
                     <tr>
-                      <td colSpan="5" className="bg-gray-700 p-3">
-                        <h3 className="font-semibold text-gray-200 mb-2">Histórico</h3>
-                        {historico[c.id] && historico[c.id].length > 0 ? (
-                          <ul className="text-sm text-gray-300 space-y-1">
-                            {historico[c.id].map(h => (
-                              <li key={h.id}>
-                                <span className="font-bold">{h.usuario}</span>: {h.acao}
-                                <span className="text-xs text-gray-400 ml-2">{h.criado_em}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="text-gray-400 italic">Sem histórico para esse chamado no momento</p>
-                        )}
-                      </td>
+                     <td colSpan="5" className="bg-gray-800 p-4 rounded-b-2xl">
+  <h3 className="font-semibold text-gray-100 mb-3 flex items-center gap-2">
+    <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+    Histórico do Chamado
+  </h3>
+
+  {historico[c.id] && historico[c.id].length > 0 ? (
+    <ul className="space-y-3">
+      {historico[c.id].map((h) => (
+        <li
+          key={h.id}
+          className="relative pl-6 border-l-2 border-red-600"
+        >
+       
+          <span className="absolute -left-[6px] top-1 w-3 h-3 bg-red-600 rounded-full"></span>
+          
+          <div className="flex flex-col">
+            <span className="text-sm text-gray-200 font-semibold">
+              {h.usuario}
+            </span>
+            <span className="text-sm text-red-300">{h.acao}</span>
+            <span className="text-xs text-gray-400 mt-1">
+              {h.criado_em}
+            </span>
+          </div>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p className="text-gray-400 italic">Sem histórico para esse chamado no momento.</p>
+  )}
+</td>
+
                     </tr>
                   )}
                 </React.Fragment>
@@ -316,6 +450,7 @@ export default function HomeAdmin() {
         </div>
 
         {/* Versão mobile (cards) */}
+
         <div className="grid gap-4 md:hidden">
           {chamados.map(c => (
             <div key={c.id} className="bg-gray-800 rounded-lg p-4 shadow-md">
@@ -336,19 +471,62 @@ export default function HomeAdmin() {
                 >
                   Histórico
                 </button>
-              </div>
 
-              {historico[c.id] && historicoAberto[c.id] && (
-                <ul className="mt-3 text-sm text-gray-300 space-y-1">
-                  {historico[c.id].map(h => (
-                    <li key={h.id}>
-                      <span className="font-bold">{h.usuario}</span>: {h.acao}
-                      <span className="text-xs text-gray-400 ml-2">{h.criado_em}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
+                <div key={c.id} className="bg-gray-800 rounded-lg p-4 shadow-md">
+  <p><span className="font-bold">Título:</span> {c.titulo}</p>
+  <p><span className="font-bold">Descrição:</span> {c.descricao}</p>
+  <p><span className="font-bold">Status:</span> {c.status}</p>
+  <p><span className="font-bold">Técnico:</span> {c.tecnico || "-"}</p>
+
+  <button
+    onClick={async () => {
+      let historicoChamado = historico[c.id];
+
+      
+      if (!historicoChamado) {
+        try {
+          const res = await fetch(`http://localhost:3005/api/chamados/${c.id}/historico`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          historicoChamado = await res.json();
+          setHistorico(prev => ({ ...prev, [c.id]: historicoChamado }));
+        } catch (err) {
+          console.error(err);
+          historicoChamado = [];
+        }
+      }
+
+      
+      gerarRelatorioChamadopdf(c, historicoChamado);
+    }}
+    className="bg-red-500 px-2 py-1 mt-2 rounded hover:bg-red-700 text-sm"
+  >
+    Gerar PDF
+  </button>
+</div>
+
+              </div>
+             
+              {historicoAberto[c.id] && (
+  <>
+    {historico[c.id]?.length > 0 ? (
+      <ul className="mt-3 text-sm text-gray-300 space-y-1">
+        {historico[c.id].map(h => (
+          <li key={h.id}>
+            <span className="font-bold">{h.usuario}</span>: {h.acao}
+            <span className="text-xs text-gray-400 ml-2">{h.criado_em}</span>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p className="mt-3 text-sm text-gray-400 italic">Sem histórico.</p>
+    )}
+  </>
+)}
+
+              
             </div>
+
           ))}
         </div>
       </section>

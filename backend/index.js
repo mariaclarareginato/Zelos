@@ -271,7 +271,7 @@ app.get("/api/chamados/:id/historico", async (req, res) => {
   try {
     const [rows] = await db.execute(`
       SELECT h.id, h.acao, u.nome AS usuario,
-             DATE_FORMAT(h.criado_em, '%Y-%m-%d %H:%i:%s') AS criado_em
+             DATE_FORMAT(h.criado_em, '%Y-%m-%d') AS criado_em
       FROM historico_chamados h
       LEFT JOIN usuarios u ON h.usuario_id = u.id
       WHERE h.chamado_id = ?
