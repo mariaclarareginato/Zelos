@@ -1,11 +1,23 @@
 'use client';
 
 // Importações
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import jsPDF from "jspdf";
-
+import html2canvas from "html2canvas";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  ResponsiveContainer
+} from "recharts";
 
 export default function HomeAdmin() {
   const router = useRouter();
@@ -21,15 +33,18 @@ export default function HomeAdmin() {
   const [historico, setHistorico] = useState({});
   const [historicoAberto, setHistoricoAberto] = useState({});
 
-  // ---------- VERIFiCANDO LOGIN E EMAIL ----------
+  // Filtro de período
+  const [dataInicio, setDataInicio] = useState("");
+  const [dataFim, setDataFim] = useState("");
 
+  // Ref para exportação
+  const relatorioRef = useRef();
+
+  // ---------- LOGIN ----------
   useEffect(() => {
     const usuario = JSON.parse(localStorage.getItem("usuarioAutenticado"));
 
     if (!usuario) {
-
-      // não logado → redireciona login
-      
       router.push("/");
       return;
     }
@@ -40,26 +55,18 @@ export default function HomeAdmin() {
     const isAdmin = email.endsWith("@administradorsenai.com");
 
     if (!isAdmin) {
-      // não admin → redireciona
-
       router.push("/home");
       return;
     }
   }, [router]);
-  
 
-  // ---------- FETCH EFFECT ----------
-
+  // ---------- FETCH ----------
   useEffect(() => {
     if (!token) return;
     fetchUsuarios();
     fetchChamados();
     fetchTecnicos();
   }, [token]);
-
-  // ---------- FETCH FUNÇÕES ----------
-
-  // Usuários
 
   const fetchUsuarios = async () => {
     try {
@@ -72,8 +79,6 @@ export default function HomeAdmin() {
     }
   };
 
-  // Chamados
-
   const fetchChamados = async () => {
     try {
       const res = await fetch("http://localhost:3005/api/chamados", {
@@ -85,8 +90,6 @@ export default function HomeAdmin() {
     }
   };
 
-  // Técnicos
-
   const fetchTecnicos = async () => {
     try {
       const res = await fetch("http://localhost:3005/api/usuarios?role=tecnico", {
@@ -97,8 +100,6 @@ export default function HomeAdmin() {
       console.error(err);
     }
   };
-
-  // Histórico
 
   const fetchHistorico = async (chamadoId) => {
     try {
@@ -112,100 +113,9 @@ export default function HomeAdmin() {
     }
   };
 
-  // PDF
-
-  const gerarRelatorioChamadopdf = (chamado, historicoChamado) => {
-    const pdf = new jsPDF();
-    const img = new Image();
-    img.src = '/imgs/logo.png';
-  
-    img.onload = () => {
-      let startY = 20;
-  
-     
-
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(14);
-      pdf.text("Relatório do Chamado:", 14, startY);
-  
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(11);
-      startY = 35;
-  
-     
-      const linesID = pdf.splitTextToSize(`ID: ${chamado.id}`, 180);
-      const linesTitulo = pdf.splitTextToSize(`Título: ${chamado.titulo}`, 180);
-      const linesDescricao = pdf.splitTextToSize(`Descrição: ${chamado.descricao}`, 180);
-      const linesStatus = pdf.splitTextToSize(`Status: ${chamado.status}`, 180);
-      const linesTecnico = pdf.splitTextToSize(`Técnico: ${chamado.tecnico}`, 180);
-  
-      [linesID, linesTitulo, linesDescricao, linesStatus, linesTecnico].forEach(lines => {
-        lines.forEach(line => {
-          pdf.text(line, 14, startY);
-          startY += 6;
-        });
-        startY += 2;
-      });
-  
-      
-      pdf.addImage(img, "PNG", 160, 10, 40, 10);
-  
-    
-      startY += 5;
-      pdf.setDrawColor(0);
-      pdf.setLineWidth(0.3);
-      pdf.line(14, startY, 200, startY);
-      startY += 10;
-  
-     
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(14);
-      pdf.text("Histórico do Chamado:", 14, startY);
-      startY += 8;
-  
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(11);
-  
-      if (historicoChamado && historicoChamado.length > 0) {
-        historicoChamado.forEach(h => {
-       
-          const linesUsuario = pdf.splitTextToSize(`Usuário: ${h.usuario}`, 180);
-  
-          const linesAcao = pdf.splitTextToSize(`Ação: ${h.acao}`, 100);
-         
-          const linesData = pdf.splitTextToSize(`Data: ${h.criado_em}`, 180);
-          
-  
-          [linesUsuario, linesAcao, linesData].forEach(lines => {
-            lines.forEach(line => {
-              pdf.text(line, 14, startY);
-              startY += 6; 
-            });
-            startY += 2; 
-          });
-  
-         
-
-          pdf.setDrawColor(150);
-          pdf.setLineWidth(0.2);
-          pdf.line(14, startY, 200, startY);
-          startY += 6;
-        });
-      } else {
-        pdf.text("Sem histórico disponível para esse chamado.", 14, startY, { maxWidth: 180 });
-      }
-  
-      
-      pdf.save(`chamado_${chamado.id}.pdf`);
-    };
-  };
-  
-  
   // ---------- USUÁRIOS ----------
-
   const atualizarUsuario = async () => {
     if (!editUsuario) return;
-
     const { id, nome, email, funcao, status } = editUsuario;
 
     try {
@@ -243,7 +153,6 @@ export default function HomeAdmin() {
   };
 
   // ---------- CHAMADOS ----------
-
   const atualizarChamado = async () => {
     if (!editChamado) return;
     const { id, titulo, descricao, status, tecnico_id, usuario_id } = editChamado;
@@ -281,7 +190,60 @@ export default function HomeAdmin() {
     }
   };
 
-  
+  // ---------- RELATÓRIOS ----------
+  const chamadosFiltrados = chamados.filter(c => {
+    if (dataInicio && new Date(c.criado_em) < new Date(dataInicio)) return false;
+    if (dataFim && new Date(c.criado_em) > new Date(dataFim)) return false;
+    return true;
+  });
+
+  const chamadosPorStatus = [
+    { name: "Pendente", value: chamadosFiltrados.filter(c => c.status === "pendente").length },
+    { name: "Em andamento", value: chamadosFiltrados.filter(c => c.status === "em andamento").length },
+    { name: "Concluído", value: chamadosFiltrados.filter(c => c.status === "concluído").length },
+  ];
+
+  const chamadosPorTecnico = tecnicos.map(t => ({
+    name: t.nome,
+    chamados: chamadosFiltrados.filter(c => c.tecnico_id === t.id).length
+  }));
+
+  const COLORS = ["#ef4444", "#f59e0b", "#10b981"];
+
+  // ---------- EXPORTAR PDF (corrigido html2canvas) ----------
+  const exportarPDF = async () => {
+    const input = relatorioRef.current;
+    if (!input) return;
+
+    // Forçar cores HEX compatíveis com html2canvas
+    input.querySelectorAll("*").forEach(el => {
+      const style = window.getComputedStyle(el);
+      if (style.backgroundColor.includes("lab")) el.style.backgroundColor = "#1f2937"; // gray-800
+      if (style.color.includes("lab")) el.style.color = "#ef4444"; // red-500
+    });
+
+    const canvas = await html2canvas(input, { scale: 2 });
+    const imgData = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF("p", "mm", "a4");
+    const imgWidth = 190;
+    const pageHeight = 290;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    let heightLeft = imgHeight;
+    let position = 10;
+
+    pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
+    pdf.save("relatorio_chamados.pdf");
+  };
 
   return (
     <main className="min-h-screen bg-gray-900 p-4 md:p-6">
@@ -311,7 +273,6 @@ export default function HomeAdmin() {
               {chamados.map(c => (
                 <React.Fragment key={c.id}>
                   <tr className="border-b border-gray-700">
-                    {/* Título */}
                     <td className="p-2">
                       {editChamado?.id === c.id ? (
                         <input
@@ -321,8 +282,6 @@ export default function HomeAdmin() {
                         />
                       ) : c.titulo}
                     </td>
-
-                    {/* Descrição */}
                     <td className="p-2">
                       {editChamado?.id === c.id ? (
                         <textarea
@@ -332,8 +291,6 @@ export default function HomeAdmin() {
                         />
                       ) : c.descricao}
                     </td>
-
-                    {/* Status */}
                     <td className="p-2">
                       {editChamado?.id === c.id ? (
                         <select
@@ -347,8 +304,6 @@ export default function HomeAdmin() {
                         </select>
                       ) : c.status}
                     </td>
-
-                    {/* Técnico */}
                     <td className="p-2">
                       {editChamado?.id === c.id ? (
                         <select
@@ -363,8 +318,6 @@ export default function HomeAdmin() {
                         </select>
                       ) : c.tecnico || "-"}
                     </td>
-
-                    {/* Ações */}
                     <td className="p-2 flex flex-wrap gap-2">
                       {editChamado?.id === c.id ? (
                         <>
@@ -384,253 +337,272 @@ export default function HomeAdmin() {
                           >
                             Histórico
                           </button>
-
-                          {/* Gerar PDF */} 
-
-                          <button
-                          onClick={() => {
-                            if (!historico[c.id]) {
-                              fetchHistorico(c.id).then(() => {
-                                gerarRelatorioChamadopdf(c, historico[c.id] || []);
-                              });
-                            } else {
-                              gerarRelatorioChamadopdf(c, historico[c.id]);
-                            }
-                          }}
-                          className="bg-red-500 px-3 py-1 rounded hover:bg-red-700"
-                          >Gerar PDF</button>
                         </>
                       )}
                     </td>
                   </tr>
 
                   {/* Histórico */}
-
                   {historicoAberto[c.id] && (
                     <tr>
-                     <td colSpan="5" className="bg-gray-800 p-4 rounded-b-2xl">
-  <h3 className="font-semibold text-gray-100 mb-3 flex items-center gap-2">
-    <span className="w-2 h-2 bg-red-500 rounded-full"></span>
-    Histórico do Chamado
-  </h3>
+                      <td colSpan="5" className="bg-gray-800 p-4 rounded-b-2xl">
+                        <h3 className="font-semibold text-gray-100 mb-3 flex items-center gap-2">
+                          <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                          Histórico do Chamado
+                        </h3>
 
-  {historico[c.id] && historico[c.id].length > 0 ? (
-    <ul className="space-y-3">
-      {historico[c.id].map((h) => (
-        <li
-          key={h.id}
-          className="relative pl-6 border-l-2 border-red-600"
-        >
-       
-          <span className="absolute -left-[6px] top-1 w-3 h-3 bg-red-600 rounded-full"></span>
-          
-          <div className="flex flex-col">
-            <span className="text-sm text-gray-200 font-semibold">
-              {h.usuario}
-            </span>
-            <span className="text-sm text-red-300">{h.acao}</span>
-            <span className="text-xs text-gray-400 mt-1">
-              {h.criado_em}
-            </span>
-          </div>
-        </li>
-      ))}
-    </ul>
-  ) : (
-    <p className="text-gray-400 italic">Sem histórico para esse chamado no momento.</p>
-  )}
-</td>
-
+                        {historico[c.id] && historico[c.id].length > 0 ? (
+                          <ul className="space-y-3">
+                            {historico[c.id].map((h) => (
+                              <li
+                                key={h.id}
+                                className="relative pl-6 border-l-2 border-red-600"
+                              >
+                                <span className="absolute -left-[6px] top-1 w-3 h-3 bg-red-600 rounded-full"></span>
+                                <div className="flex flex-col">
+                                  <span className="text-sm text-gray-200 font-semibold">
+                                    {h.usuario}
+                                  </span>
+                                  <span className="text-sm text-red-300">{h.acao}</span>
+                                  <span className="text-xs text-gray-400 mt-1">
+                                    {h.criado_em}
+                                  </span>
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-gray-400 italic">Sem histórico para esse chamado no momento.</p>
+                        )}
+                      </td>
                     </tr>
                   )}
                 </React.Fragment>
               ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Versão mobile (cards) */}
-
-        <div className="grid gap-4 md:hidden">
-          {chamados.map(c => (
-            <div key={c.id} className="bg-gray-800 rounded-lg p-4 shadow-md">
-              <p><span className="font-bold">Título:</span> {c.titulo}</p>
-              <p><span className="font-bold">Descrição:</span> {c.descricao}</p>
-              <p><span className="font-bold">Status:</span> {c.status}</p>
-              <p><span className="font-bold">Técnico:</span> {c.tecnico || "-"}</p>
-
-              <div className="mt-2 flex flex-wrap gap-2">
-                <button onClick={() => setEditChamado(c)} className="bg-red-900 px-2 py-1 rounded hover:bg-red-800 text-sm">Editar</button>
-                <button onClick={() => deletarChamado(c.id)} className="bg-red-500 px-2 py-1 rounded hover:bg-red-600 text-sm">Deletar</button>
-                <button
-                  onClick={() => {
-                    if (!historico[c.id]) fetchHistorico(c.id);
-                    setHistoricoAberto(prev => ({ ...prev, [c.id]: !prev[c.id] }));
-                  }}
-                  className="bg-red-600 px-2 py-1 rounded hover:bg-red-700 text-sm"
-                >
-                  Histórico
-                </button>
-
-                <div key={c.id} className="bg-gray-800 rounded-lg p-4 shadow-md">
-  <p><span className="font-bold">Título:</span> {c.titulo}</p>
-  <p><span className="font-bold">Descrição:</span> {c.descricao}</p>
-  <p><span className="font-bold">Status:</span> {c.status}</p>
-  <p><span className="font-bold">Técnico:</span> {c.tecnico || "-"}</p>
-
-  <button
-    onClick={async () => {
-      let historicoChamado = historico[c.id];
-
-      
-      if (!historicoChamado) {
-        try {
-          const res = await fetch(`http://localhost:3005/api/chamados/${c.id}/historico`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          historicoChamado = await res.json();
-          setHistorico(prev => ({ ...prev, [c.id]: historicoChamado }));
-        } catch (err) {
-          console.error(err);
-          historicoChamado = [];
-        }
-      }
-
-      
-      gerarRelatorioChamadopdf(c, historicoChamado);
-    }}
-    className="bg-red-500 px-2 py-1 mt-2 rounded hover:bg-red-700 text-sm"
-  >
-    Gerar PDF
-  </button>
-</div>
-
-              </div>
              
-              {historicoAberto[c.id] && (
-  <>
-    {historico[c.id]?.length > 0 ? (
-      <ul className="mt-3 text-sm text-gray-300 space-y-1">
-        {historico[c.id].map(h => (
-          <li key={h.id}>
-            <span className="font-bold">{h.usuario}</span>: {h.acao}
-            <span className="text-xs text-gray-400 ml-2">{h.criado_em}</span>
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <p className="mt-3 text-sm text-gray-400 italic">Sem histórico.</p>
-    )}
-  </>
-)}
-
-              
-            </div>
-
-          ))}
-        </div>
-      </section>
-
-      
-
-      {/* ---------------- USUÁRIOS ---------------- */}
-      <section className="mb-12 gap-10">
-        <h2 className="text-2xl md:text-3xl text-gray-200 mb-6 text-center font-semibold">Usuários</h2>
-
-        {/* Tabela Desktop */}
-        <div className="hidden md:block overflow-x-auto">
-          <table className="w-full text-gray-200 bg-gray-800 rounded-lg overflow-hidden">
-            <thead className="bg-gray-700">
-              <tr>
-                <th className="p-3">Nome</th>
-                <th>Email</th>
-                <th>Função</th>
-                <th>Status</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {usuarios.map(u => (
-                <tr key={u.id} className="border-b border-gray-700">
-                  <td className="p-2">
-                    {editUsuario?.id === u.id ? (
-                      <input
-                        className="p-1 bg-gray-600 text-gray-100 rounded w-full"
-                        value={editUsuario.nome}
-                        onChange={e => setEditUsuario({ ...editUsuario, nome: e.target.value })}
-                      />
-                    ) : u.nome}
-                  </td>
-                  <td className="p-2">
-                    {editUsuario?.id === u.id ? (
-                      <input
-                        className="p-1 bg-gray-600 text-gray-100 rounded w-full"
-                        value={editUsuario.email}
-                        onChange={e => setEditUsuario({ ...editUsuario, email: e.target.value })}
-                      />
-                    ) : u.email}
-                  </td>
-                  <td className="p-2">
-                    {editUsuario?.id === u.id ? (
-                      <select
-                        className="p-1 bg-gray-600 text-gray-100 rounded w-full"
-                        value={editUsuario.funcao}
-                        onChange={e => setEditUsuario({ ...editUsuario, funcao: e.target.value })}
-                      >
-                        <option value="admin">Admin</option>
-                        <option value="tecnico">Técnico</option>
-                        <option value="usuario">Usuário</option>
-                      </select>
-                    ) : u.funcao}
-                  </td>
-                  <td className="p-2">
-                    {editUsuario?.id === u.id ? (
-                      <select
-                        className="p-1 bg-gray-600 text-gray-100 rounded w-full"
-                        value={editUsuario.status}
-                        onChange={e => setEditUsuario({ ...editUsuario, status: e.target.value })}
-                      >
-                        <option value="ativo">Ativo</option>
-                        <option value="inativo">Inativo</option>
-                      </select>
-                    ) : u.status}
-                  </td>
-                  <td className="p-2 flex flex-wrap gap-2">
-                    {editUsuario?.id === u.id ? (
-                      <>
-                        <button onClick={atualizarUsuario} className="bg-red-500 px-3 py-1 rounded hover:bg-red-600">Salvar</button>
-                        <button onClick={() => setEditUsuario(null)} className="bg-gray-500 px-3 py-1 rounded hover:bg-gray-600">Cancelar</button>
-                      </>
-                    ) : (
-                      <>
-                        <button onClick={() => setEditUsuario(u)} className="bg-red-900 px-3 py-1 rounded hover:bg-red-800">Editar</button>
-                        <button onClick={() => deletarUsuario(u.id)} className="bg-red-500 px-3 py-1 rounded hover:bg-red-600">Deletar</button>
-                      </>
-                    )}
-                  </td>
-                </tr>
-              ))}
             </tbody>
           </table>
         </div>
+        </section>
 
-        {/* Versão mobile (cards) */}
-        <div className="grid gap-4 md:hidden">
-          {usuarios.map(u => (
-            <div key={u.id} className="bg-gray-800 rounded-lg p-4 shadow-md">
-              <p><span className="font-bold">Nome:</span> {u.nome}</p>
-              <p><span className="font-bold">Email:</span> {u.email}</p>
-              <p><span className="font-bold">Função:</span> {u.funcao}</p>
-              <p><span className="font-bold">Status:</span> {u.status}</p>
-              <div className="mt-2 flex flex-wrap gap-2">
-                <button onClick={() => setEditUsuario(u)} className="bg-red-900 px-2 py-1 rounded hover:bg-red-800 text-sm">Editar</button>
-                <button onClick={() => deletarUsuario(u.id)} className="bg-red-500 px-2 py-1 rounded hover:bg-red-600 text-sm">Deletar</button>
-              </div>
-            </div>
-          ))}
+        
+{/* ---------------- USUÁRIOS ---------------- */}
+<section className="mb-12 gap-10">
+  <h2 className="text-2xl md:text-3xl text-gray-200 mb-6 text-center font-semibold">Usuários</h2>
+
+  {/* Tabela Desktop */}
+  <div className="hidden md:block overflow-x-auto">
+    <table className="w-full text-gray-200 bg-gray-800 rounded-lg overflow-hidden">
+      <thead className="bg-gray-700">
+        <tr>
+          <th className="p-3">Nome</th>
+          <th>Email</th>
+          <th>Função</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {usuarios.map(u => (
+          <tr key={u.id} className="border-b border-gray-700">
+            <td className="p-2">
+              {editUsuario?.id === u.id ? (
+                <input
+                  className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+                  value={editUsuario.nome}
+                  onChange={e => setEditUsuario({ ...editUsuario, nome: e.target.value })}
+                />
+              ) : u.nome}
+            </td>
+            <td className="p-2">
+              {editUsuario?.id === u.id ? (
+                <input
+                  className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+                  value={editUsuario.email}
+                  onChange={e => setEditUsuario({ ...editUsuario, email: e.target.value })}
+                />
+              ) : u.email}
+            </td>
+            <td className="p-2">
+              {editUsuario?.id === u.id ? (
+                <select
+                  className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+                  value={editUsuario.funcao}
+                  onChange={e => setEditUsuario({ ...editUsuario, funcao: e.target.value })}
+                >
+                  <option value="admin">Admin</option>
+                  <option value="tecnico">Técnico</option>
+                  <option value="usuario">Usuário</option>
+                </select>
+              ) : u.funcao}
+            </td>
+            <td className="p-2">
+              {editUsuario?.id === u.id ? (
+                <select
+                  className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+                  value={editUsuario.status}
+                  onChange={e => setEditUsuario({ ...editUsuario, status: e.target.value })}
+                >
+                  <option value="ativo">Ativo</option>
+                  <option value="inativo">Inativo</option>
+                </select>
+              ) : u.status}
+            </td>
+            <td className="p-2 flex flex-wrap gap-2">
+              {editUsuario?.id === u.id ? (
+                <>
+                  <button
+                    onClick={atualizarUsuario}
+                    className="bg-red-500 px-3 py-1 rounded hover:bg-red-600"
+                  >
+                    Salvar
+                  </button>
+                  <button
+                    onClick={() => setEditUsuario(null)}
+                    className="bg-gray-500 px-3 py-1 rounded hover:bg-gray-600"
+                  >
+                    Cancelar
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setEditUsuario(u)}
+                    className="bg-red-900 px-3 py-1 rounded hover:bg-red-800"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => deletarUsuario(u.id)}
+                    className="bg-red-500 px-3 py-1 rounded hover:bg-red-600"
+                  >
+                    Deletar
+                  </button>
+                </>
+              )}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  {/* Versão mobile (cards) */}
+  <div className="grid gap-4 md:hidden">
+    {usuarios.map(u => (
+      <div key={u.id} className="bg-gray-800 rounded-lg p-4 shadow-md">
+        <p><span className="font-bold">Nome:</span> {u.nome}</p>
+        <p><span className="font-bold">Email:</span> {u.email}</p>
+        <p><span className="font-bold">Função:</span> {u.funcao}</p>
+        <p><span className="font-bold">Status:</span> {u.status}</p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <button
+            onClick={() => setEditUsuario(u)}
+            className="bg-red-900 px-2 py-1 rounded hover:bg-red-800 text-sm"
+          >
+            Editar
+          </button>
+          <button
+            onClick={() => deletarUsuario(u.id)}
+            className="bg-red-500 px-2 py-1 rounded hover:bg-red-600 text-sm"
+          >
+            Deletar
+          </button>
         </div>
-      </section>
-    </main>
-  );
+      </div>
+       ))}
+  </div>
+
+        {/* ---------------- RELATÓRIOS ---------------- */}
+        <section ref={relatorioRef} className="mb-12">
+          <h2 className="text-2xl md:text-3xl text-gray-200 mb-6 text-center font-semibold">
+            Relatórios e Gráficos
+          </h2>
+
+          {/* Filtro de período */}
+          <div className="flex flex-wrap gap-4 justify-center mb-6">
+            <input
+              type="date"
+              value={dataInicio}
+              onChange={e => setDataInicio(e.target.value)}
+              className="bg-gray-800 text-gray-200 p-2 rounded"
+            />
+            <input
+              type="date"
+              value={dataFim}
+              onChange={e => setDataFim(e.target.value)}
+              className="bg-gray-800 text-gray-200 p-2 rounded"
+            />
+          </div>
+
+          {/* Resumo */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            {chamadosPorStatus.map((s, i) => (
+              <div key={i} className="bg-gray-800 p-6 rounded-2xl shadow-lg text-center">
+                <h3 className="text-xl font-bold text-red-400">{s.name}</h3>
+                <p className="text-3xl font-extrabold text-gray-100 mt-2">{s.value}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Gráficos */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            {/* Pizza - Status */}
+            <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
+              <h3 className="text-lg font-semibold text-gray-200 mb-4 text-center">Distribuição por Status</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={chamadosPorStatus}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                    label
+                  >
+                    {chamadosPorStatus.map((_, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Barras - Técnicos */}
+            <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
+              <h3 className="text-lg font-semibold text-gray-200 mb-4 text-center">Chamados por Técnico</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={chamadosPorTecnico}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+                  <XAxis dataKey="name" stroke="#ccc" />
+                  <YAxis stroke="#ccc" />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="chamados" fill="#ef4444" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </section>
+
+        {/* Botão PDF */}
+        <div className="text-center mb-12">
+          <button
+            onClick={exportarPDF}
+            className="bg-red-600 hover:bg-red-700 text-gray-400 font-bold py-2 px-6 rounded-lg shadow-lg"
+          >
+            Salvar Relatório em PDF
+          </button>
+          </div>
+
+  
+</section>
+</main>
+
+);
+
 }
 
