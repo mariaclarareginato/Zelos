@@ -1,5 +1,5 @@
-CREATE DATABASE sitezelos;
-USE sitezelos;
+CREATE DATABASE senaisitezelos;
+USE senaisitezelos;
 
 -- Tabela de usuários
 CREATE TABLE usuarios (
@@ -132,6 +132,20 @@ INSERT INTO apontamentos (chamado_id, tecnico_id, descricao, comeco, fimatendime
 (6,1,'Manutenção no cano do banheiro masculino','2025-08-19 15:00','2025-08-19 20:00'),
 (7,6,'Manutenção do sistema interno realizada','2025-08-15 16:30','2025-08-15 18:15');
 
+CREATE TABLE mensagens (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  usuario_id INT NOT NULL,
+  tecnico_id INT NOT NULL,
+  mensagem TEXT NOT NULL,
+  resposta TEXT DEFAULT NULL,
+  respondida BOOLEAN DEFAULT FALSE,
+  lida BOOLEAN DEFAULT FALSE,
+  criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+  FOREIGN KEY (tecnico_id) REFERENCES usuarios(id)
+);
+
+
 -- Relacionar técnico ao pool
 INSERT INTO pool_tecnico (id_pool, id_tecnico) VALUES
 (1,2),
@@ -152,4 +166,3 @@ FROM chamados c
 LEFT JOIN pool p ON c.tipo_id = p.id
 LEFT JOIN usuarios u ON c.tecnico_id = u.id
 ORDER BY c.criado_em DESC; 
-

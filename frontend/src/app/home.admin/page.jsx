@@ -5,18 +5,19 @@ import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import autoTable from "jspdf-autotable";
+import logo from "../../../public/imgs/logo.png"; 
 import {
   PieChart,
   Pie,
   Cell,
   Tooltip,
-  Legend,
   BarChart,
   Bar,
   XAxis,
   YAxis,
   CartesianGrid,
-  ResponsiveContainer
+ 
 } from "recharts";
 
 export default function HomeAdmin() {
@@ -191,6 +192,7 @@ export default function HomeAdmin() {
   };
 
   // ---------- RELATÓRIOS ----------
+
   const chamadosFiltrados = chamados.filter(c => {
     if (dataInicio && new Date(c.criado_em) < new Date(dataInicio)) return false;
     if (dataFim && new Date(c.criado_em) > new Date(dataFim)) return false;
@@ -211,42 +213,105 @@ export default function HomeAdmin() {
   const COLORS = ["#ef4444", "#f59e0b", "#10b981"];
 
 
+  function fixColorsForCanvas(el) {
+    const style = window.getComputedStyle(el);
+  
+    if (style.backgroundColor.includes("lab(")) {
+      el.style.backgroundColor = "rgb(31,41,55)"; // bg-gray-800
+    }
+    if (style.color.includes("lab(")) {
+      el.style.color = "rgb(239,68,68)"; // text-red-500
+    }
+  
+    Array.from(el.children).forEach(fixColorsForCanvas);
+  }
+  
 
-  // ---------- EXPORTAR PDF (corrigido html2canvas) ----------
-  const exportarPDF = async () => {
+   // ---------- PDF ----------
+
+   const exportarPDF = async () => {
     const input = relatorioRef.current;
     if (!input) return;
-
-    // Forçar cores HEX compatíveis com html2canvas
-    input.querySelectorAll("*").forEach(el => {
-      const style = window.getComputedStyle(el);
-      if (style.backgroundColor.includes("lab")) el.style.backgroundColor = "#1f2937"; // gray-800
-      if (style.color.includes("lab")) el.style.color = "#ef4444"; // red-500
-    });
-
-    const canvas = await html2canvas(input, { scale: 2 });
-    const imgData = canvas.toDataURL("image/png");
-
+  
+    // ---------- PDF ----------
     const pdf = new jsPDF("p", "mm", "a4");
-    const imgWidth = 190;
-    const pageHeight = 290;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    let heightLeft = imgHeight;
-    let position = 10;
-
-    pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
-
-    while (heightLeft > 0) {
-      position = heightLeft - imgHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-    }
-
+    const pageWidth = pdf.internal.pageSize.getWidth();
+  
+    // ---------- LOGO ----------
+    const imgLogo = new Image();
+    imgLogo.src = logo.src;
+    pdf.addImage(imgLogo, "PNG", 10, 10, 40, 12);
+  
+    // ---------- TÍTULO ----------
+    pdf.setFontSize(18);
+    pdf.text("Relatório Zelos", pageWidth / 2, 20, { align: "center" });
+  
+    // ---------- PERÍODO ----------
+    pdf.setFontSize(12);
+    pdf.text(`Período: ${dataInicio} - ${dataFim}`, pageWidth / 2, 28, { align: "center" });
+  
+    // ---------- GRÁFICOS ----------
+    fixColorsForCanvas(input);
+    let yPos = 40;
+  
+    const adicionarGrafico = async (selector) => {
+      const div = input.querySelector(selector);
+      if (!div) return 0;
+  
+      const canvas = await html2canvas(div, { scale: 2 });
+      const imgData = canvas.toDataURL("image/png");
+  
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = 120; // largura do gráfico no PDF
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width * 0.7; 
+      const xPos = (pageWidth - pdfWidth) / 2; // centraliza horizontalmente
+  
+      pdf.addImage(imgData, "PNG", xPos, yPos, pdfWidth, pdfHeight);
+      return pdfHeight + 10; // retorna espaço ocupado
+    };
+  
+    yPos += await adicionarGrafico("#graficoPizza");
+    yPos += await adicionarGrafico("#graficoBarra");
+  
+    // ------------------- TABELAS -------------------
+    pdf.addPage();
+    pdf.setFontSize(14);
+    pdf.text("Lista de Chamados", 10, 20);
+  
+    autoTable(pdf, {
+      startY: 25,
+      head: [["Título", "Descrição", "Status", "Técnico"]],
+      body: chamados.map(c => [
+        c.titulo,
+        c.descricao,
+        c.status,
+        tecnicos.find(t => t.id === c.tecnico_id)?.nome || "-"
+      ]),
+      theme: "grid",
+      styles: { fontSize: 10 },
+      headStyles: { fillColor: [239,68,68], textColor: [255,255,255], fontStyle: "bold" },
+      bodyStyles: { fillColor: [31,41,55], textColor: [229,231,235] },
+      alternateRowStyles: { fillColor: [55,65,81] },
+    });
+  
+    let finalY = pdf.lastAutoTable.finalY + 10;
+    pdf.text("Lista de Usuários", 10, finalY);
+  
+    autoTable(pdf, {
+      startY: finalY + 5,
+      head: [["Nome", "Email", "Função", "Status"]],
+      body: usuarios.map(u => [u.nome, u.email, u.funcao, u.status]),
+      theme: "grid",
+      styles: { fontSize: 10 },
+      headStyles: { fillColor: [239,68,68], textColor: [255,255,255], fontStyle: "bold" },
+      bodyStyles: { fillColor: [31,41,55], textColor: [229,231,235] },
+      alternateRowStyles: { fillColor: [55,65,81] },
+    });
+  
     pdf.save("relatorio_chamados.pdf");
   };
-
+  
+  
   return (
     <main className="min-h-screen bg-gray-900 p-4 md:p-6">
       <h1 className="text-3xl md:text-5xl font-extrabold text-red-500 text-center mb-8 drop-shadow-lg">
@@ -514,11 +579,9 @@ export default function HomeAdmin() {
       </div>
        ))}
   </div>
-
-     {/* ---------------- RELATÓRIOS ---------------- */}
-
-<section ref={relatorioRef} className="mb-12">
-  <h2 className="text-2xl md:text-3xl text-gray-400 mb-6 text-center font-semibold">
+{/* ---------------- RELATÓRIOS ---------------- */}
+<section ref={relatorioRef} className="mb-12 px-4">
+  <h2 className="text-2xl md:text-3xl text-red-500 mb-6 text-center font-semibold">
     Relatórios e Gráficos
   </h2>
 
@@ -528,85 +591,94 @@ export default function HomeAdmin() {
       type="date"
       value={dataInicio}
       onChange={e => setDataInicio(e.target.value)}
-      className="bg-gray-800 text-gray-400 p-2 rounded"
+      className="bg-gray-800 text-red-500 p-2 rounded border-none"
     />
     <input
       type="date"
       value={dataFim}
       onChange={e => setDataFim(e.target.value)}
-      className="bg-gray-800 text-gray-200 p-2 rounded"
+      className="bg-gray-800 text-red-500 p-2 rounded border-none"
     />
   </div>
 
   {/* Resumo */}
   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
     {chamadosPorStatus.map((s, i) => (
-      <div key={i} className="bg-gray-800 p-6 rounded-2xl shadow-lg text-center">
-        <h3 className="text-xl font-bold text-red-400">{s.name}</h3>
-        <p className="text-3xl font-extrabold text-gray-400 mt-2">{s.value}</p>
+      <div
+        key={i}
+        className="bg-gray-800 p-6 rounded-2xl text-center"
+        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}
+      >
+        <h3 className="text-xl font-bold text-red-500">{s.name}</h3>
+        <p className="text-3xl font-extrabold text-red-500 mt-2">{s.value}</p>
       </div>
     ))}
   </div>
 
- {/* Gráficos */}
-<div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+  {/* Gráficos */}
+  <div className="flex flex-wrap justify-center gap-10">
+    
+    {/* Pizza - Status */}
 
-  {/* Pizza - Status */}
-  <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
-    <h3 className="text-lg font-semibold text-gray-400 mb-4 text-center">
-      Distribuição por Status
-    </h3>
-    <ResponsiveContainer width="100%" height={300}>
-      <PieChart>
-        <Pie
-          data={chamadosPorStatus}
-          cx="50%"
-          cy="50%"
-          outerRadius="80%"
-          dataKey="value"
-          
-        >
-          {chamadosPorStatus.map((_, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-          ))}
-        </Pie>
+    <div id="graficoPizza" className="bg-gray-800 p-6 rounded-2xl text-center" style={{ width: 350 }}>
+      <h3 className="text-lg font-semibold text-red-500 mb-4">Distribuição por Status</h3>
+      <PieChart width={300} height={300}>
+      
+
+<Pie
+  data={chamadosPorStatus}
+  cx={150}
+  cy={150}
+  outerRadius={120}
+  dataKey="value"
+>
+  {chamadosPorStatus.map((_, index) => (
+    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke={COLORS[index % COLORS.length]} />
+  ))}
+</Pie>
+
         <Tooltip
-          contentStyle={{
-            backgroundColor: "#333",
-            borderRadius: "8px",
-            border: "none",
-          }}
-          labelStyle={{ color: "#af9595ff" }}
-          itemStyle={{ color: "#b8a9a9ff" }}
+          contentStyle={{ backgroundColor: "#1f2937", border: "1px solid #f33939" }}
+          labelStyle={{ color: "#f33939" }}
+          itemStyle={{ color: "#f33939" }}
         />
-        <Legend wrapperStyle={{ color: "#b39c9cff", fontSize: "14px" }} />
       </PieChart>
-    </ResponsiveContainer>
-  </div>
 
-
+      {/* Legenda HTML simples */}
+      <div className="flex justify-center flex-wrap mt-4 gap-2 text-red-500 text-sm">
+        {chamadosPorStatus.map((s, i) => (
+          <div key={i}>{`${s.name} (${s.value})`}</div>
+        ))}
+      </div>
+    </div>
 
     {/* Barras - Técnicos */}
-    <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
-      <h3 className="text-lg font-semibold text-gray-400 mb-4 text-center">Chamados por Técnico</h3>
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={chamadosPorTecnico}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-          <XAxis dataKey="name" stroke="#ccc" />
-          <YAxis stroke="#ccc" />
-          <Tooltip
-            contentStyle={{ backgroundColor: "#333", borderRadius: "8px", border: "none" }}
-            labelStyle={{ color: "#b9adadff" }}
-            itemStyle={{ color: "#b9adadff" }}
-          />
-          <Legend wrapperStyle={{ color: "#a88e8eff" }} />
-          <Bar dataKey="chamados" fill="#f33939ff" />
-        </BarChart>
-      </ResponsiveContainer>
+
+    <div id="graficoBarra" className="bg-gray-800 p-6 rounded-2xl text-center" style={{ width: 350 }}>
+      <h3 className="text-lg font-semibold text-red-500 mb-4">Chamados por Técnico</h3>
+      <BarChart width={300} height={300} data={chamadosPorTecnico}>
+        <CartesianGrid stroke="none" />
+        <XAxis dataKey="name" stroke="#f33939" tick={false}/>
+        <YAxis stroke="#f33939" />
+        <Tooltip
+          contentStyle={{ backgroundColor: "#1f2937", border: "1px solid #f33939" }}
+          labelStyle={{ color: "#f33939" }}
+          itemStyle={{ color: "#f33939" }}
+        />
+        <Bar dataKey="chamados" fill="#f33939" />
+      </BarChart>
+
+      {/* Legenda HTML simples */}
+      <div className="flex justify-center flex-wrap mt-4 gap-2 text-red-500 text-sm">
+        {chamadosPorTecnico.map((t, i) => (
+          <div key={i}>{`${t.name} (${t.chamados})`}</div>
+        ))}
+      </div>
     </div>
-    </div>
-  
+
+  </div>
 </section>
+
 
 {/* Botão PDF */}
 <div className="text-center mb-12">

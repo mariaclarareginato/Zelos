@@ -55,11 +55,7 @@ const Footer = () => {
                     Nossa História
                   </Link>
                 </li>
-                <li>
-                  <Link href="/contato" className="hover:text-gray-400">
-                    Contato
-                  </Link>
-                </li>
+              
                 <li>
                   <Link href="/termosdeuso" className="hover:text-gray-400">
                     Termos de Uso

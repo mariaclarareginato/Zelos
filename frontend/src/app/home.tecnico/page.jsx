@@ -1,7 +1,5 @@
 'use client';
 
-// Importações
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -15,48 +13,35 @@ export default function HomeTecnico() {
   const [historico, setHistorico] = useState([]);
   const [message, setMessage] = useState("");
 
+  const [mensagens, setMensagens] = useState([]);
+  const [resposta, setResposta] = useState("");
+
   const [token, setToken] = useState(null);
   const [tecnicoId, setTecnicoId] = useState(null);
 
   const [descricaoApontamento, setDescricaoApontamento] = useState("");
   const [comeco, setComeco] = useState("");
-  const [fimatendimento, setFimAtendimento] = useState("");
+  const [fimAtendimento, setFimAtendimento] = useState("");
   const [apontamentoMessage, setApontamentoMessage] = useState("");
 
   // ---------- VERIFICAÇÃO LOGIN & EMAIL ----------
-
   useEffect(() => {
     const usuario = JSON.parse(localStorage.getItem("usuarioAutenticado"));
 
-    if (!usuario) {
-      
-      // não logado → redireciona login
-      router.push("/");
-      return;
-    }
+    if (!usuario) return router.push("/");
 
     const email = usuario.email?.toLowerCase() || "";
-    const isTecnico = email.endsWith("@tecnicosenai.com"); 
+    const isTecnico = email.endsWith("@tecnicosenai.com");
 
-    if (!isTecnico) {
-
-      // não técnico → redireciona
-
-      router.push("/home"); 
-      return;
-    }
-
-    // é técnico → define token e id
+    if (!isTecnico) return router.push("/home");
 
     setToken(usuario.token);
     setTecnicoId(Number(usuario.id));
   }, [router]);
 
-
+  // ---------- FETCH CHAMADOS ----------
   useEffect(() => {
     if (!token || !tecnicoId) return;
-
-// FETCH DATA
 
     async function fetchData() {
       try {
@@ -64,6 +49,7 @@ export default function HomeTecnico() {
           fetch("http://localhost:3005/api/chamados/disponiveis", { headers: { Authorization: `Bearer ${token}` } }),
           fetch(`http://localhost:3005/api/chamados/tecnico/${tecnicoId}`, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
+
         setChamadosDisponiveis(await resDisponiveis.json());
         setMeusChamados(await resMeus.json());
       } catch (err) {
@@ -74,6 +60,24 @@ export default function HomeTecnico() {
     fetchData();
   }, [token, tecnicoId]);
 
+  // ---------- FETCH MENSAGENS ----------
+  const fetchMensagens = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch("http://localhost:3005/api/buscar/mensagens", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setMensagens(await res.json());
+    } catch (err) {
+      console.error("Erro ao buscar mensagens:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchMensagens();
+  }, [token]);
+
+  // ---------- FETCH HISTÓRICO ----------
   useEffect(() => {
     if (!selectedChamadoId) {
       setHistorico([]);
@@ -99,6 +103,7 @@ export default function HomeTecnico() {
     fetchHistorico();
   }, [selectedChamadoId, meusChamados, token]);
 
+  // ---------- FUNÇÕES AUXILIARES ----------
   const atualizarMeusChamados = async () => {
     if (!token || !tecnicoId) return;
     try {
@@ -121,6 +126,7 @@ export default function HomeTecnico() {
       const data = await res.json();
       setMessage(data.message || "Chamado assumido!");
       await atualizarMeusChamados();
+
       const resDisponiveis = await fetch("http://localhost:3005/api/chamados/disponiveis", { headers: { Authorization: `Bearer ${token}` } });
       setChamadosDisponiveis(await resDisponiveis.json());
     } catch (err) {
@@ -135,10 +141,7 @@ export default function HomeTecnico() {
     try {
       const res = await fetch(`http://localhost:3005/api/chamados/${selectedChamadoId}/status`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ status: novoStatus }),
       });
       const data = await res.json();
@@ -151,7 +154,7 @@ export default function HomeTecnico() {
   };
 
   const criarApontamento = async () => {
-    if (!selectedChamadoId || !descricaoApontamento || !comeco || !fimatendimento) {
+    if (!selectedChamadoId || !descricaoApontamento || !comeco || !fimAtendimento) {
       setApontamentoMessage("Preencha todos os campos do apontamento!");
       return;
     }
@@ -165,7 +168,7 @@ export default function HomeTecnico() {
           tecnico_id: tecnicoId,
           descricao: descricaoApontamento,
           comeco,
-          fimatendimento
+          fim: fimAtendimento,
         }),
       });
       const data = await res.json();
@@ -173,19 +176,50 @@ export default function HomeTecnico() {
       setDescricaoApontamento("");
       setComeco("");
       setFimAtendimento("");
-      setHistorico(prev => [
-        ...prev,
-        { id: data.id || Date.now(), descricao: descricaoApontamento }
-      ]);
+      setHistorico(prev => [...prev, { id: data.id || Date.now(), descricao: descricaoApontamento }]);
     } catch (err) {
       console.error(err);
       setApontamentoMessage("Erro ao registrar apontamento");
     }
   };
 
+  const responderMensagem = async (id) => {
+    if (!resposta) return alert("Digite uma resposta!");
+    try {
+      const res = await fetch(`http://localhost:3005/api/mensagens/${id}/responder`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ resposta }),
+      });
+      const data = await res.json();
+      setResposta("");
+      fetchMensagens();
+      alert(data.message || "Resposta enviada!");
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao responder mensagem");
+    }
+  };
+
+  const excluirMensagem = async (id) => {
+    if (!confirm("Deseja realmente excluir esta mensagem?")) return;
+    try {
+      const res = await fetch(`http://localhost:3005/api/mensagens/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      fetchMensagens();
+      alert(data.message || "Mensagem excluída!");
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao excluir mensagem");
+    }
+  };
+
+  // ---------- RENDER ----------
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 p-6">
-      <br></br><br></br>
       <h1 className="text-5xl font-extrabold text-red-500 text-center mb-12 drop-shadow-lg">Painel do Técnico</h1>
 
       {/* Chamados Disponíveis */}
@@ -272,7 +306,7 @@ export default function HomeTecnico() {
                 <input
                   type="datetime-local"
                   className="flex-1 p-2 rounded-lg bg-gray-600 text-gray-100"
-                  value={fimatendimento}
+                  value={fimAtendimento}
                   onChange={e => setFimAtendimento(e.target.value)}
                 />
               </div>
@@ -294,6 +328,50 @@ export default function HomeTecnico() {
             </div>
           </div>
         )}
+      </section>
+
+      {/* Mensagens */}
+      <section className="mb-12">
+        <h2 className="text-3xl text-gray-200 mb-6 text-center font-semibold">Mensagens de usuários</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {mensagens.length === 0 ? (
+            <p className="text-center text-red-400 col-span-full">Nenhuma mensagem</p>
+          ) : (
+            mensagens.map(m => (
+              <div key={m.id} className="bg-gray-700 rounded-xl shadow-xl p-6 hover:scale-105 transform transition duration-300">
+                <p className="text-gray-200 mb-2"><strong>De:</strong> {m.usuario}</p>
+                <p className="text-gray-100 mb-2">{m.mensagem}</p>
+                {m.resposta && <p className="text-green-400 mb-2"><strong>Resposta:</strong> {m.resposta}</p>}
+
+                {!m.resposta && (
+                  <textarea
+                    placeholder="Digite sua resposta..."
+                    className="w-full p-2 rounded bg-gray-600 text-gray-100 mb-2 resize-none"
+                    value={resposta}
+                    onChange={e => setResposta(e.target.value)}
+                  />
+                )}
+
+                <div className="flex gap-2">
+                  {!m.resposta && (
+                    <button
+                      className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded font-semibold w-full"
+                      onClick={() => responderMensagem(m.id)}
+                    >
+                      Responder
+                    </button>
+                  )}
+                  <button
+                    className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded font-semibold w-full"
+                    onClick={() => excluirMensagem(m.id)}
+                  >
+                    Excluir
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </section>
     </main>
   );

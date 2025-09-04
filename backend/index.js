@@ -18,7 +18,7 @@ const db = mysql.createPool({
   host: "localhost",
   user: "root",
   password: "",
-  database: "sitezelos",
+  database: "senaisitezelos",
 });
 
 const JWT_SECRET = "segredo_super_secreto";
@@ -416,6 +416,83 @@ app.put("/api/chamados/:id", authMiddleware, async (req, res) => {
   }
 
   res.json({ message: "Chamado atualizado e histórico registrado" });
+});
+
+// --------  Mensagens ----------
+
+app.post("/api/mensagens", authMiddleware, async (req, res) => {
+  try {
+    const { tecnico_id, mensagem } = req.body;
+    const usuario_id = req.user.id;
+
+    const [result] = await db.query(
+      "INSERT INTO mensagens (usuario_id, tecnico_id, mensagem) VALUES (?, ?, ?)",
+      [usuario_id, tecnico_id, mensagem]
+    );
+
+    res.status(201).json({ message: "Mensagem enviada!", id: result.insertId });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+app.get("/api/buscar/mensagens", authMiddleware, async (req, res) => {
+  try {
+    const tecnico_id = req.user.id;
+    const [rows] = await db.query(
+      `SELECT m.*, u.nome AS usuario 
+       FROM mensagens m 
+       LEFT JOIN usuarios u ON m.usuario_id = u.id 
+       WHERE tecnico_id = ? 
+       ORDER BY criado_em DESC`,
+      [tecnico_id]
+    );
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put("/api/mensagens/:id/responder", authMiddleware, async (req, res) => {
+  try {
+    const tecnico_id = req.user.id;
+    const { resposta } = req.body;
+    const mensagemId = req.params.id;
+
+    const [rows] = await db.query(
+      "SELECT * FROM mensagens WHERE id = ? AND tecnico_id = ?",
+      [mensagemId, tecnico_id]
+    );
+
+    if (rows.length === 0) return res.status(403).json({ message: "Mensagem não encontrada ou acesso negado" });
+
+    await db.query(
+      "UPDATE mensagens SET resposta = ?, respondida = TRUE WHERE id = ?",
+      [resposta, mensagemId]
+    );
+
+    res.json({ message: "Resposta enviada!" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/api/mensagens/meus", authMiddleware, async (req, res) => {
+  try {
+    const usuario_id = req.user.id;
+    const [rows] = await db.query(
+      `SELECT m.*, u.nome AS tecnico_nome
+       FROM mensagens m
+       LEFT JOIN usuarios u ON m.tecnico_id = u.id
+       WHERE m.usuario_id = ?
+       ORDER BY m.criado_em DESC`,
+      [usuario_id]
+    );
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 
