@@ -210,6 +210,8 @@ export default function HomeAdmin() {
 
   const COLORS = ["#ef4444", "#f59e0b", "#10b981"];
 
+
+
   // ---------- EXPORTAR PDF (corrigido html2canvas) ----------
   const exportarPDF = async () => {
     const input = relatorioRef.current;
@@ -255,7 +257,7 @@ export default function HomeAdmin() {
 
       {/* ---------------- CHAMADOS ---------------- */}
       <section className="mb-12 gap-4">
-        <h2 className="text-2xl md:text-3xl text-gray-200 mb-6 text-center font-semibold">Chamados</h2>
+        <h2 className="text-2xl md:text-3xl text-gray-400 mb-6 text-center font-semibold">Chamados</h2>
 
         {/* Tabela Desktop */}
         <div className="hidden md:block overflow-x-auto">
@@ -388,7 +390,7 @@ export default function HomeAdmin() {
         
 {/* ---------------- USUÁRIOS ---------------- */}
 <section className="mb-12 gap-10">
-  <h2 className="text-2xl md:text-3xl text-gray-200 mb-6 text-center font-semibold">Usuários</h2>
+  <h2 className="text-2xl md:text-3xl text-gray-400 mb-6 text-center font-semibold">Usuários</h2>
 
   {/* Tabela Desktop */}
   <div className="hidden md:block overflow-x-auto">
@@ -513,90 +515,108 @@ export default function HomeAdmin() {
        ))}
   </div>
 
-        {/* ---------------- RELATÓRIOS ---------------- */}
-        <section ref={relatorioRef} className="mb-12">
-          <h2 className="text-2xl md:text-3xl text-gray-200 mb-6 text-center font-semibold">
-            Relatórios e Gráficos
-          </h2>
+     {/* ---------------- RELATÓRIOS ---------------- */}
 
-          {/* Filtro de período */}
-          <div className="flex flex-wrap gap-4 justify-center mb-6">
-            <input
-              type="date"
-              value={dataInicio}
-              onChange={e => setDataInicio(e.target.value)}
-              className="bg-gray-800 text-gray-200 p-2 rounded"
-            />
-            <input
-              type="date"
-              value={dataFim}
-              onChange={e => setDataFim(e.target.value)}
-              className="bg-gray-800 text-gray-200 p-2 rounded"
-            />
-          </div>
+<section ref={relatorioRef} className="mb-12">
+  <h2 className="text-2xl md:text-3xl text-gray-400 mb-6 text-center font-semibold">
+    Relatórios e Gráficos
+  </h2>
 
-          {/* Resumo */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            {chamadosPorStatus.map((s, i) => (
-              <div key={i} className="bg-gray-800 p-6 rounded-2xl shadow-lg text-center">
-                <h3 className="text-xl font-bold text-red-400">{s.name}</h3>
-                <p className="text-3xl font-extrabold text-gray-100 mt-2">{s.value}</p>
-              </div>
-            ))}
-          </div>
+  {/* Filtro de período */}
+  <div className="flex flex-wrap gap-4 justify-center mb-6">
+    <input
+      type="date"
+      value={dataInicio}
+      onChange={e => setDataInicio(e.target.value)}
+      className="bg-gray-800 text-gray-400 p-2 rounded"
+    />
+    <input
+      type="date"
+      value={dataFim}
+      onChange={e => setDataFim(e.target.value)}
+      className="bg-gray-800 text-gray-200 p-2 rounded"
+    />
+  </div>
 
-          {/* Gráficos */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            {/* Pizza - Status */}
-            <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
-              <h3 className="text-lg font-semibold text-gray-200 mb-4 text-center">Distribuição por Status</h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={chamadosPorStatus}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label
-                  >
-                    {chamadosPorStatus.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+  {/* Resumo */}
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+    {chamadosPorStatus.map((s, i) => (
+      <div key={i} className="bg-gray-800 p-6 rounded-2xl shadow-lg text-center">
+        <h3 className="text-xl font-bold text-red-400">{s.name}</h3>
+        <p className="text-3xl font-extrabold text-gray-400 mt-2">{s.value}</p>
+      </div>
+    ))}
+  </div>
 
-            {/* Barras - Técnicos */}
-            <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
-              <h3 className="text-lg font-semibold text-gray-200 mb-4 text-center">Chamados por Técnico</h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={chamadosPorTecnico}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-                  <XAxis dataKey="name" stroke="#ccc" />
-                  <YAxis stroke="#ccc" />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="chamados" fill="#ef4444" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </section>
+ {/* Gráficos */}
+<div className="grid grid-cols-1 md:grid-cols-2 gap-10">
 
-        {/* Botão PDF */}
-        <div className="text-center mb-12">
-          <button
-            onClick={exportarPDF}
-            className="bg-red-600 hover:bg-red-700 text-gray-400 font-bold py-2 px-6 rounded-lg shadow-lg"
-          >
-            Salvar Relatório em PDF
-          </button>
-          </div>
+  {/* Pizza - Status */}
+  <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
+    <h3 className="text-lg font-semibold text-gray-400 mb-4 text-center">
+      Distribuição por Status
+    </h3>
+    <ResponsiveContainer width="100%" height={300}>
+      <PieChart>
+        <Pie
+          data={chamadosPorStatus}
+          cx="50%"
+          cy="50%"
+          outerRadius="80%"
+          dataKey="value"
+          
+        >
+          {chamadosPorStatus.map((_, index) => (
+            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+          ))}
+        </Pie>
+        <Tooltip
+          contentStyle={{
+            backgroundColor: "#333",
+            borderRadius: "8px",
+            border: "none",
+          }}
+          labelStyle={{ color: "#af9595ff" }}
+          itemStyle={{ color: "#b8a9a9ff" }}
+        />
+        <Legend wrapperStyle={{ color: "#b39c9cff", fontSize: "14px" }} />
+      </PieChart>
+    </ResponsiveContainer>
+  </div>
+
+
+
+    {/* Barras - Técnicos */}
+    <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
+      <h3 className="text-lg font-semibold text-gray-400 mb-4 text-center">Chamados por Técnico</h3>
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={chamadosPorTecnico}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+          <XAxis dataKey="name" stroke="#ccc" />
+          <YAxis stroke="#ccc" />
+          <Tooltip
+            contentStyle={{ backgroundColor: "#333", borderRadius: "8px", border: "none" }}
+            labelStyle={{ color: "#b9adadff" }}
+            itemStyle={{ color: "#b9adadff" }}
+          />
+          <Legend wrapperStyle={{ color: "#a88e8eff" }} />
+          <Bar dataKey="chamados" fill="#f33939ff" />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+    </div>
+  
+</section>
+
+{/* Botão PDF */}
+<div className="text-center mb-12">
+  <button
+    onClick={exportarPDF}
+    className="bg-red-600 hover:bg-red-700 text-gray-350 font-bold py-2 px-6 rounded-lg shadow-lg"
+  >
+    Salvar Relatório em PDF
+  </button>
+</div>
 
   
 </section>
