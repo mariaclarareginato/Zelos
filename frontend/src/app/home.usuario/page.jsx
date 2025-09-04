@@ -1,4 +1,7 @@
 'use client';
+
+// Imoortações
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -56,6 +59,7 @@ export default function HomeUsuario() {
   }, [usuarioId, token]);
 
   // Criar chamado
+
   async function criarChamado(e) {
     e.preventDefault();
     if (!titulo || !descricao || !tipoId) {
@@ -96,45 +100,77 @@ export default function HomeUsuario() {
   }
 
   // Deletar mensagem
+  
   async function deletarMensagem(id) {
-    if (!confirm("Deseja realmente deletar esta mensagem?")) return;
-    try {
-      const res = await fetch(`http://localhost:3005/api/mensagens/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) setMensagens(mensagens.filter(m => m.id !== id));
-    } catch (err) {
-      console.error(err);
+  if (!confirm("Deseja realmente deletar esta mensagem?")) return;
+  try {
+    const res = await fetch(`http://localhost:3005/api/mensagens/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    console.log(res.status, data); // Status e mensagem
+    if (res.ok) {
+      setMensagens((prev) => prev.filter((m) => m.id !== id));
+    } else {
+      alert(data.message || "Erro ao deletar mensagem");
     }
+  } catch (err) {
+    console.error(err);
   }
+}
+
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 p-6">
-      <h1 className="text-center text-5xl font-extrabold text-red-500 mb-12 drop-shadow-lg">Painel do Usuário</h1>
-
-    
+      <h1 className="text-center text-5xl font-extrabold text-red-500 mb-12 drop-shadow-lg">
+        Painel do Usuário
+      </h1>
 
       {/* Formulário Criar Chamado */}
       <section className="mb-12 flex flex-col items-center">
         <h2 className="text-3xl text-gray-200 mb-6 font-semibold text-center">Abrir Chamado</h2>
-        <form onSubmit={criarChamado} className="w-full max-w-lg bg-gray-700 p-6 rounded-xl shadow-xl flex flex-col space-y-4">
-          <input type="text" placeholder="Título" value={titulo} onChange={(e) => setTitulo(e.target.value)} className="w-full px-4 py-2 rounded text-gray-100 bg-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500" />
-          <br></br>
-          <textarea placeholder="Descrição" value={descricao} onChange={(e) => setDescricao(e.target.value)} className="w-full px-4 py-2 rounded text-gray-100 bg-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500 resize-none" />
-            <br></br>
-          <select value={tipoId} onChange={(e) => setTipoId(e.target.value)} className="w-full px-4 py-2 rounded text-gray-100 bg-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500">
-            <br></br>
+        <form
+          onSubmit={criarChamado}
+          className="w-full max-w-lg bg-gray-700 p-6 rounded-2xl shadow-2xl flex flex-col gap-5"
+        >
+          <input
+            type="text"
+            placeholder="Título"
+            value={titulo}
+            onChange={(e) => setTitulo(e.target.value)}
+            className="w-full px-4 py-3 rounded text-gray-100 bg-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+          />
+          <textarea
+            placeholder="Descrição"
+            value={descricao}
+            onChange={(e) => setDescricao(e.target.value)}
+            className="w-full px-4 py-3 rounded text-gray-100 bg-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+          />
+          <select
+            value={tipoId}
+            onChange={(e) => setTipoId(e.target.value)}
+            className="w-full px-4 py-3 rounded text-gray-100 bg-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+          >
             <option value="">-- Selecione o tipo (1 a 4) --</option>
-            {[1,2,3,4].map((tipo) => <option key={tipo} value={tipo}>Tipo {tipo}</option>)}
+            {[1, 2, 3, 4].map((tipo) => (
+              <option key={tipo} value={tipo}>
+                Tipo {tipo}
+              </option>
+            ))}
           </select>
-          <br></br>
-          <button type="submit" className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded font-semibold transition duration-200">Criar Chamado +</button>
+          <button
+            type="submit"
+            className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl font-semibold transition duration-200"
+          >
+            Criar Chamado +
+          </button>
           {mensagemAviso && <p className="text-center text-red-300">{mensagemAviso}</p>}
         </form>
       </section>
 
       {/* Lista de Chamados */}
+
       <section className="mb-12">
         <h2 className="text-3xl text-gray-200 mb-6 text-center font-semibold">Seus Chamados</h2>
         {meusChamados.length === 0 ? (
@@ -142,15 +178,23 @@ export default function HomeUsuario() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {meusChamados.map((chamado) => (
-              <div key={chamado.id} className="bg-gray-700 p-6 rounded-xl shadow-xl hover:scale-105 transform transition duration-300">
+              <div
+                key={chamado.id}
+                className="bg-gray-700 p-6 rounded-2xl shadow-2xl hover:scale-105 transform transition duration-300"
+              >
                 <h3 className="text-red-400 font-bold text-xl mb-2">{chamado.titulo}</h3>
-                
                 <p className="text-gray-200 mb-2">{chamado.descricao}</p>
-                
-                <p className="text-gray-300 mb-1"><b>Status:</b> {chamado.status}</p>
-                
-                <p className="text-gray-300 mb-1"><b>Técnico:</b> {chamado.tecnico || "Não atribuído"}</p>
-                {chamado.resposta_tecnico && <p className="text-green-300 mt-2"><b>Resposta do técnico:</b> {chamado.resposta_tecnico}</p>}
+                <p className="text-gray-300 mb-1">
+                  <b>Status:</b> {chamado.status}
+                </p>
+                <p className="text-gray-300 mb-1">
+                  <b>Técnico:</b> {chamado.tecnico || "Não atribuído"}
+                </p>
+                {chamado.resposta_tecnico && (
+                  <p className="text-green-300 mt-2">
+                    <b>Resposta do técnico:</b> {chamado.resposta_tecnico}
+                  </p>
+                )}
               </div>
             ))}
           </div>
@@ -159,7 +203,10 @@ export default function HomeUsuario() {
 
       {/* Botão para enviar nova mensagem */}
       <div className="flex justify-center mb-12">
-        <button onClick={() => router.push("/contato")} className="bg-red-500 hover:bg-red-600 text-white py-3 px-6 rounded-xl font-semibold transition">
+        <button
+          onClick={() => router.push("/contato")}
+          className="bg-red-500 hover:bg-red-600 text-white py-3 px-6 rounded-2xl font-semibold shadow-lg transition"
+        >
           Enviar nova mensagem a algum técnico
         </button>
       </div>
@@ -172,10 +219,22 @@ export default function HomeUsuario() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {mensagens.map((msg) => (
-              <div key={msg.id} className="bg-gray-700 p-6 rounded-xl shadow-xl hover:scale-105 transform transition duration-300">
-                <p className="text-gray-100 mb-2"><b>Você:</b> {msg.mensagem}</p>
-                {msg.resposta && <p className="text-green-300 mt-1"><b>{msg.tecnico_nome}:</b> {msg.resposta}</p>}
-                <button onClick={() => deletarMensagem(msg.id)} className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded font-semibold mt-2">
+              <div
+                key={msg.id}
+                className="bg-gray-700 p-6 rounded-2xl shadow-2xl hover:scale-105 transform transition duration-300"
+              >
+                <p className="text-gray-100 mb-2">
+                  <b>Você:</b> {msg.mensagem}
+                </p>
+                {msg.resposta && (
+                  <p className="text-green-300 mt-1">
+                    <b>{msg.tecnico_nome}:</b> {msg.resposta}
+                  </p>
+                )}
+                <button
+                  onClick={() => deletarMensagem(msg.id)}
+                  className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-xl font-semibold mt-3 w-full transition"
+                >
                   Deletar Mensagem
                 </button>
               </div>

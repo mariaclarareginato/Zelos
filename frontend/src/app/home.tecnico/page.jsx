@@ -1,5 +1,6 @@
 'use client';
 
+// Importações
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -104,6 +105,7 @@ export default function HomeTecnico() {
   }, [selectedChamadoId, meusChamados, token]);
 
   // ---------- FUNÇÕES AUXILIARES ----------
+
   const atualizarMeusChamados = async () => {
     if (!token || !tecnicoId) return;
     try {
@@ -204,7 +206,7 @@ export default function HomeTecnico() {
   const excluirMensagem = async (id) => {
     if (!confirm("Deseja realmente excluir esta mensagem?")) return;
     try {
-      const res = await fetch(`http://localhost:3005/api/mensagens/${id}`, {
+      const res = await fetch(`http://localhost:3005/api/mensagens/${id}/tecnico`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -217,7 +219,7 @@ export default function HomeTecnico() {
     }
   };
 
-  // ---------- RENDER ----------
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 p-6">
       <h1 className="text-5xl font-extrabold text-red-500 text-center mb-12 drop-shadow-lg">Painel do Técnico</h1>
@@ -246,6 +248,7 @@ export default function HomeTecnico() {
       </section>
 
       {/* Meus Chamados */}
+      
       <section className="mb-12">
         <h2 className="text-3xl text-gray-200 mb-6 text-center font-semibold">Meus Chamados</h2>
         <div className="flex justify-center mb-6">

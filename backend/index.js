@@ -495,6 +495,64 @@ app.get("/api/mensagens/meus", authMiddleware, async (req, res) => {
   }
 });
 
+// Deletar mensagem do usuário
+
+app.delete("/api/mensagens/:id", authMiddleware, async (req, res) => {
+  try {
+    const mensagemId = Number(req.params.id);
+    const usuarioId = req.user.id;
+
+    if (isNaN(mensagemId)) {
+      return res.status(400).json({ message: "ID inválido" });
+    }
+
+    // Verifica se a mensagem pertence ao usuário
+    const [rows] = await db.query(
+      "SELECT * FROM mensagens WHERE id = ? AND usuario_id = ?",
+      [mensagemId, usuarioId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(403).json({ message: "Mensagem não encontrada ou acesso negado" });
+    }
+
+    // Deleta a mensagem
+    await db.query("DELETE FROM mensagens WHERE id = ?", [mensagemId]);
+
+    res.json({ message: "Mensagem deletada com sucesso!" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete("/api/mensagens/:id/tecnico", authMiddleware, async (req, res) => {
+  try {
+    const mensagemId = Number(req.params.id);
+    const tecnicoId = req.user.id;
+
+    if (isNaN(mensagemId)) {
+      return res.status(400).json({ message: "ID inválido" });
+    }
+
+    // Verifica se a mensagem pertence a este técnico
+    const [rows] = await db.query(
+      "SELECT * FROM mensagens WHERE id = ? AND tecnico_id = ?",
+      [mensagemId, tecnicoId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(403).json({ message: "Mensagem não encontrada ou acesso negado" });
+    }
+
+    await db.query("DELETE FROM mensagens WHERE id = ?", [mensagemId]);
+
+    res.json({ message: "Mensagem deletada com sucesso!" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 
 // ------------------  Iniciar servidor ------------------

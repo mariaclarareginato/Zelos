@@ -1,6 +1,7 @@
 'use client';
 
 // Importações
+
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import jsPDF from "jspdf";
@@ -233,7 +234,6 @@ export default function HomeAdmin() {
     const input = relatorioRef.current;
     if (!input) return;
   
-    // ---------- PDF ----------
     const pdf = new jsPDF("p", "mm", "a4");
     const pageWidth = pdf.internal.pageSize.getWidth();
   
@@ -371,20 +371,28 @@ export default function HomeAdmin() {
                         </select>
                       ) : c.status}
                     </td>
-                    <td className="p-2">
-                      {editChamado?.id === c.id ? (
-                        <select
-                          className="p-1 bg-gray-600 text-gray-100 rounded w-full"
-                          value={editChamado.tecnico_id || ""}
-                          onChange={e => setEditChamado({ ...editChamado, tecnico_id: Number(e.target.value) })}
-                        >
-                          <option value="">-- Selecione Técnico --</option>
-                          {tecnicos.map(t => (
-                            <option key={t.id} value={t.id}>{t.nome} (ID {t.id})</option>
-                          ))}
-                        </select>
-                      ) : c.tecnico || "-"}
-                    </td>
+                   <td className="p-2">
+                {editChamado?.id === c.id ? (
+                 <select
+                 className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+                 value={editChamado.tecnico_id ?? ""} 
+                 onChange={(e) =>
+                 setEditChamado({
+                 ...editChamado,
+                 tecnico_id: e.target.value === "" ? null : Number(e.target.value),
+                 })
+                 }
+                 >
+                     <option value="">-- Sem técnico --</option>
+                     {tecnicos.map((t) => (
+                     <option key={t.id} value={t.id}>
+                     {t.nome} (ID {t.id})
+                     </option>
+                      ))}
+                     </select>
+                     ) : c.tecnico || "-"}
+                     </td>
+
                     <td className="p-2 flex flex-wrap gap-2">
                       {editChamado?.id === c.id ? (
                         <>
