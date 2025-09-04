@@ -1,18 +1,29 @@
 'use client';
 
+// Importações
+
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Contato() {
+  const router = useRouter();
+
   const [tecnicos, setTecnicos] = useState([]);
   const [token, setToken] = useState(null);
   const [mensagem, setMensagem] = useState("");
   const [tecnicoSelecionado, setTecnicoSelecionado] = useState("");
+  const [usuarioId, setUsuarioId] = useState(null);
 
   useEffect(() => {
     const usuario = JSON.parse(localStorage.getItem("usuarioAutenticado"));
-    if (!usuario) return;
+    if (!usuario) return router.push("/");
+
+    const email = usuario.email?.toLowerCase() || "";
+    //  Apenas usuários podem acessar
+    if (!email.endsWith("@senaisp.com")) return router.push("/home");
 
     setToken(usuario.token);
+    setUsuarioId(Number(usuario.id));
 
     // Busca técnicos ativos
     fetch("http://localhost:3005/api/usuarios?role=tecnico", {
@@ -21,7 +32,7 @@ export default function Contato() {
       .then(res => res.json())
       .then(data => setTecnicos(data))
       .catch(err => console.error(err));
-  }, []);
+  }, [router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
