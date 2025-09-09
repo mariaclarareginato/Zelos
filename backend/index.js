@@ -239,26 +239,16 @@ app.delete("/api/usuarios/:id", authMiddleware, async (req, res) => {
 
 // Técnicos ativos
 
-app.get("/api/usuarios", authMiddleware, async (req, res) => {
-  try {
-    const { role } = req.query;
-    let query = "SELECT id, nome, email, funcao, status FROM usuarios WHERE 1=1";
-    let params = [];
-
-    if (role) {
-      query += " AND funcao = ?";
-      params.push(role);
+  app.get("/api/usuarios/tecnicosativos", authMiddleware, async (req, res) => {
+    try {
+      let query = "SELECT id, nome, email, funcao, status FROM usuarios WHERE funcao = 'Técnico' AND status = 'ativo'";
+      const [rows] = await db.query(query);
+      res.json(rows);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
-
-    // Sempre traz só ativos
-    query += " AND status = 'ativo'";
-
-    const [rows] = await db.query(query, params);
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+  });
+  
 
 
 
@@ -267,7 +257,6 @@ app.get("/api/usuarios", authMiddleware, async (req, res) => {
 
 app.get("/api/chamados/:id/historico", async (req, res) => {
   const chamadoId = req.params.id;
-
   try {
     const [rows] = await db.execute(`
       SELECT h.id, h.acao, u.nome AS usuario,

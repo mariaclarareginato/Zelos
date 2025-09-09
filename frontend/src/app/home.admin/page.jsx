@@ -94,7 +94,7 @@ export default function HomeAdmin() {
 
   const fetchTecnicos = async () => {
     try {
-      const res = await fetch("http://localhost:3005/api/usuarios?role=tecnico", {
+      const res = await fetch("http://localhost:3005/api/usuarios/tecnicosativos", {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTecnicos(await res.json());
