@@ -262,8 +262,8 @@ export default function HomeAdmin() {
       const imgData = canvas.toDataURL("image/png");
   
       const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = 120; // largura do gráfico no PDF
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width * 0.7; 
+      const pdfWidth = 150; // largura do gráfico no PDF
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width * 0.5; 
       const xPos = (pageWidth - pdfWidth) / 2; // centraliza horizontalmente
   
       pdf.addImage(imgData, "PNG", xPos, yPos, pdfWidth, pdfHeight);
