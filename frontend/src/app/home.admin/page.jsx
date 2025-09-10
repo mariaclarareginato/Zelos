@@ -322,7 +322,7 @@ export default function HomeAdmin() {
 
       {/* ---------------- CHAMADOS ---------------- */}
       <section className="mb-12 gap-4">
-        <h2 className="text-2xl md:text-3xl text-gray-400 mb-6 text-center font-semibold">Chamados</h2>
+        <h2 className="hidden md:block text-3xl text-gray-400 mb-6 text-center font-semibold">Chamados</h2>
 
         {/* Tabela Desktop */}
         <div className="hidden md:block overflow-x-auto">
@@ -463,7 +463,7 @@ export default function HomeAdmin() {
         
 {/* ---------------- USUÁRIOS ---------------- */}
 <section className="mb-12 gap-10">
-  <h2 className="text-2xl md:text-3xl text-gray-400 mb-6 text-center font-semibold">Usuários</h2>
+  <h2 className="hidden md:block text-3xl text-gray-400 mb-6 text-center font-semibold">Usuários</h2>
 
   {/* Tabela Desktop */}
   <div className="hidden md:block overflow-x-auto">
@@ -562,31 +562,226 @@ export default function HomeAdmin() {
     </table>
   </div>
 
-  {/* Versão mobile (cards) */}
+
+
+
+
+
+  {/* Cards Mobile */}
+
+  {/* Chamados */}
+
   <div className="grid gap-4 md:hidden">
-    {usuarios.map(u => (
-      <div key={u.id} className="bg-gray-800 rounded-lg p-4 shadow-md">
-        <p><span className="font-bold">Nome:</span> {u.nome}</p>
-        <p><span className="font-bold">Email:</span> {u.email}</p>
-        <p><span className="font-bold">Função:</span> {u.funcao}</p>
-        <p><span className="font-bold">Status:</span> {u.status}</p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          <button
-            onClick={() => setEditUsuario(u)}
-            className="bg-red-900 px-2 py-1 rounded hover:bg-red-800 text-sm"
+    <h2 className="font-bold text-xl text-center text-gray-300">Chamados</h2>
+  {chamados.map((c) => (
+    <div key={c.id} className="bg-gray-800 rounded-lg p-4 shadow-md">
+      <p>
+        <span className="font-bold text-red-500">Título:</span>{" "}
+        {editChamado?.id === c.id ? (
+          <input
+            className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+            value={editChamado.titulo}
+            onChange={(e) => setEditChamado({ ...editChamado, titulo: e.target.value })}
+          />
+        ) : c.titulo}
+      </p>
+
+      <p>
+        <span className="font-bold text-red-500">Descrição:</span>{" "}
+        {editChamado?.id === c.id ? (
+          <textarea
+            className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+            value={editChamado.descricao}
+            onChange={(e) => setEditChamado({ ...editChamado, descricao: e.target.value })}
+          />
+        ) : c.descricao}
+      </p>
+
+      <p>
+        <span className="font-bold text-red-500">Status:</span>{" "}
+        {editChamado?.id === c.id ? (
+          <select
+            className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+            value={editChamado.status}
+            onChange={(e) => setEditChamado({ ...editChamado, status: e.target.value })}
           >
-            Editar
-          </button>
-          <button
-            onClick={() => deletarUsuario(u.id)}
-            className="bg-red-500 px-2 py-1 rounded hover:bg-red-600 text-sm"
-          >
-            Deletar
-          </button>
-        </div>
+            <option value="aberto">Aberto</option>
+            <option value="em andamento">Em andamento</option>
+            <option value="concluído">Concluído</option>
+          </select>
+        ) : c.status}
+      </p>
+
+      <p>
+        <span className="font-bold text-red-500">Técnico:</span>{" "}
+        {editChamado?.id === c.id ? (
+          <input
+            className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+            value={editChamado.tecnico || ""}
+            onChange={(e) => setEditChamado({ ...editChamado, tecnico: e.target.value })}
+          />
+        ) : c.tecnico || "-"}
+      </p>
+
+      <div className="mt-2 flex flex-wrap gap-2">
+        {editChamado?.id === c.id ? (
+          <>
+            <button
+              onClick={atualizarChamado}
+              className="bg-red-500 px-2 py-1 rounded hover:bg-red-600 text-sm"
+            >
+              Salvar
+            </button>
+            <button
+              onClick={() => setEditChamado(null)}
+              className="bg-gray-500 px-2 py-1 rounded hover:bg-gray-600 text-sm"
+            >
+              Cancelar
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={() => setEditChamado(c)}
+              className="bg-red-900 px-2 py-1 rounded hover:bg-red-800 text-sm"
+            >
+              Editar
+            </button>
+            <button
+              onClick={() => deletarChamado(c.id)}
+              className="bg-red-500 px-2 py-1 rounded hover:bg-red-600 text-sm"
+            >
+              Deletar
+            </button>
+            <button
+              onClick={() => {
+                if (!historico[c.id]) fetchHistorico(c.id);
+                setHistoricoAberto((prev) => ({ ...prev, [c.id]: !prev[c.id] }));
+              }}
+              className="bg-red-600 px-2 py-1 rounded hover:bg-red-700 text-sm"
+            >
+              Histórico
+            </button>
+          </>
+        )}
       </div>
-       ))}
-  </div>
+
+      {/* Histórico com rolagem se necessário */}
+      {historicoAberto[c.id] && (
+        <div className="mt-3 bg-gray-700 p-3 rounded max-h-[300px] overflow-y-auto">
+          <h3 className="font-semibold text-gray-100 mb-2">Histórico</h3>
+          {historico[c.id] && historico[c.id].length > 0 ? (
+            <ul className="space-y-2">
+              {historico[c.id].map((h) => (
+                <li key={h.id} className="text-sm text-gray-300 border-b border-gray-600 pb-1">
+                  <p>
+                    <strong>{h.usuario}</strong> - {h.acao}
+                  </p>
+                  <p className="text-xs text-gray-400">{h.criado_em}</p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-400 italic">Sem histórico disponível.</p>
+          )}
+        </div>
+      )}
+    </div>
+  ))}
+</div>
+
+
+{/* Usuários */}
+
+<div className="grid gap-4 md:hidden mt-6">
+<h2 className="font-bold text-xl text-center text-gray-300">Usuários</h2>
+  {usuarios.map((u) => (
+    <div key={u.id} className="bg-gray-800 rounded-lg p-4 shadow-md">
+      <p>
+        <span className="font-bold">Nome:</span>{" "}
+        {editUsuario?.id === u.id ? (
+          <input
+            className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+            value={editUsuario.nome}
+            onChange={(e) => setEditUsuario({ ...editUsuario, nome: e.target.value })}
+          />
+        ) : u.nome}
+      </p>
+
+      <p>
+        <span className="font-bold">Email:</span>{" "}
+        {editUsuario?.id === u.id ? (
+          <input
+            className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+            value={editUsuario.email}
+            onChange={(e) => setEditUsuario({ ...editUsuario, email: e.target.value })}
+          />
+        ) : u.email}
+      </p>
+
+      <p>
+        <span className="font-bold">Função:</span>{" "}
+        {editUsuario?.id === u.id ? (
+          <input
+            className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+            value={editUsuario.funcao}
+            onChange={(e) => setEditUsuario({ ...editUsuario, funcao: e.target.value })}
+          />
+        ) : u.funcao}
+      </p>
+
+      <p>
+        <span className="font-bold">Status:</span>{" "}
+        {editUsuario?.id === u.id ? (
+          <select
+            className="p-1 bg-gray-600 text-gray-100 rounded w-full"
+            value={editUsuario.status}
+            onChange={(e) => setEditUsuario({ ...editUsuario, status: e.target.value })}
+          >
+            <option value="ativo">Ativo</option>
+            <option value="inativo">Inativo</option>
+          </select>
+        ) : u.status}
+      </p>
+
+      <div className="mt-2 flex flex-wrap gap-2">
+        {editUsuario?.id === u.id ? (
+          <>
+            <button
+              onClick={atualizarUsuario}
+              className="bg-red-500 px-2 py-1 rounded hover:bg-red-600 text-sm"
+            >
+              Salvar
+            </button>
+            <button
+              onClick={() => setEditUsuario(null)}
+              className="bg-gray-500 px-2 py-1 rounded hover:bg-gray-600 text-sm"
+            >
+              Cancelar
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={() => setEditUsuario(u)}
+              className="bg-red-900 px-2 py-1 rounded hover:bg-red-800 text-sm"
+            >
+              Editar
+            </button>
+            <button
+              onClick={() => deletarUsuario(u.id)}
+              className="bg-red-500 px-2 py-1 rounded hover:bg-red-600 text-sm"
+            >
+              Deletar
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  ))}
+</div>
+
+
 {/* ---------------- RELATÓRIOS ---------------- */}
 <section ref={relatorioRef} className="mb-12 px-4">
   <h2 className="text-2xl md:text-3xl text-red-500 mb-6 text-center font-semibold">

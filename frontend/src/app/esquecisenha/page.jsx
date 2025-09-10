@@ -58,7 +58,7 @@ export default function EsqueciSenha() {
   // Formulário
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen bg-black">
       <div
         className="absolute inset-0 bg-cover bg-center opacity-40 bg-no-repeat z-0"
        
@@ -82,7 +82,7 @@ export default function EsqueciSenha() {
 
           <form className="space-y-6" onSubmit={handleRedefinirSenha}>
             <div>
-              <label className="block text-sm font-medium text-gray-450 mb-1">
+              <label className="block text-sm font-medium text-gray-500 mb-1">
                 <br></br>
                 Email institucional
                 <br></br><br></br>
@@ -90,7 +90,7 @@ export default function EsqueciSenha() {
               <div className="relative">
                 <input
                   type="email"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-450 text-center"
+                  className="w-full px-4 py-3 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-500 text-center"
                   placeholder="seu.email@dominio.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -108,14 +108,14 @@ export default function EsqueciSenha() {
 
             <br></br>
             <div>
-              <label className="block text-sm font-medium text-gray-450 mb-1">
+              <label className="block text-sm font-medium text-gray-500 mb-1">
                 Nova senha
                 <br></br><br></br>
               </label>
               <div className="relative">
                 <input
                   type={mostrarSenha ? "text" : "password"}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-450 text-center"
+                  className="w-full px-4 py-3 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-500 text-center"
                   placeholder="••••••••"
                   value={novaSenha}
                   onChange={(e) => setNovaSenha(e.target.value)}
@@ -145,14 +145,14 @@ export default function EsqueciSenha() {
 
             <br></br>
             <div>
-              <label className="block text-sm font-medium text-gray-450 mb-1">
+              <label className="block text-sm font-medium text-gray-500 mb-1">
                 Confirme a nova senha
                 <br></br><br></br>
               </label>
               <div className="relative">
                 <input
                   type={mostrarConfirmSenha ? "text" : "password"}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-450 text-center"
+                  className="w-full px-4 py-3 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-500 text-center"
                   placeholder="••••••••"
                   value={csenha}
                   onChange={(e) => setCsenha(e.target.value)}
@@ -196,7 +196,7 @@ export default function EsqueciSenha() {
             <div className="flex items-center justify-center space-x-2">
 
 
-            {/*Formulário*/}
+            {/* Link login */}
         
               <span className="text-sm text-gray-500 font-medium">---------        ou       ---------</span>
              

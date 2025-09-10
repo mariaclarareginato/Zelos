@@ -77,7 +77,7 @@ export default function Cadastro() {
   };
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen bg-black">
       <div className="absolute inset-0 bg-cover bg-center opacity-40 bg-no-repeat z-0"></div>
       <div className="relative z-10 min-h-screen flex items-center justify-center py-12 px-4">
         <div className="w-full max-w-md bg-gray/95 backdrop-blur-sm rounded-2xl shadow-xl p-8">
@@ -102,11 +102,11 @@ export default function Cadastro() {
 
             {/* CPF */}
             <div>
-              <label className="block text-sm font-medium text-gray-450 mb-1">CPF</label>
+              <label className="block text-sm font-medium text-gray-500 mb-1">CPF</label>
               <input
                 id="cpf"
                 type="text"
-                className={`w-full px-4 py-3 border ${cpfError ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 ${cpfError ? 'focus:ring-red-500' : 'focus:ring-red-500'} text-gray-450 text-center`}
+                className={`w-full px-4 py-3 border ${cpfError ? 'border-red-500' : 'border-gray-500'} rounded-lg focus:outline-none focus:ring-2 ${cpfError ? 'focus:ring-red-500' : 'focus:ring-red-500'} text-gray-500 text-center`}
                 placeholder="000.000.000-00"
                 value={cpf}
                 onChange={handleCPFChange}
@@ -119,10 +119,10 @@ export default function Cadastro() {
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-450 mb-1">Email institucional</label>
+              <label className="block text-sm font-medium text-gray-500 mb-1">Email institucional</label>
               <input
                 type="email"
-                className="w-full px-4 py-3 border border-gray-450 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-450 text-center"
+                className="w-full px-4 py-3 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-500 text-center"
                 placeholder="seu.email@dominio.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -134,10 +134,10 @@ export default function Cadastro() {
 
             {/* Senha */}
             <div>
-              <label className="block text-sm font-medium text-gray-450 mb-1">Senha</label>
+              <label className="block text-sm font-medium text-gray-500 mb-1">Senha</label>
               <input
                 type={mostrarSenha ? 'text' : 'password'}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-450 text-center"
+                className="w-full px-4 py-3 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-500 text-center"
                 placeholder="••••••••"
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
@@ -149,10 +149,10 @@ export default function Cadastro() {
 
             {/* Confirmar Senha */}
             <div>
-              <label className="block text-sm font-medium text-gray-450 mb-1">Confirme sua senha</label>
+              <label className="block text-sm font-medium text-gray-500 mb-1">Confirme sua senha</label>
               <input
                 type={mostrarConfirmSenha ? 'text' : 'password'}
-                className="w-full px-4 py-3 border border-gray-450 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-450 text-center"
+                className="w-full px-4 py-3 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-500 text-center"
                 placeholder="••••••••"
                 value={csenha}
                 onChange={(e) => setCsenha(e.target.value)}
@@ -165,10 +165,10 @@ export default function Cadastro() {
 
             {/* Código Admin */}
             <div>
-              <label className="block text-sm font-medium text-gray-450 mb-1">Código de Administrador</label>
+              <label className="block text-sm font-medium text-gray-500 mb-1">Código de Administrador</label>
               <input
                 type="text"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-450 text-center"
+                className="w-full px-4 py-3 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-500 text-center"
                 placeholder="Código fornecido para adms"
                 value={codigoAdmin}
                 onChange={(e) => setCodigoAdmin(e.target.value)}
@@ -179,7 +179,7 @@ export default function Cadastro() {
 
             <button
               type="submit"
-              className="w-full bg-red-1000 text-gray-400 py-3 rounded-lg hover:bg-red-900 transition duration-300 flex items-center justify-center space-x-2 font-medium"
+              className="w-full bg-red-1000 text-gray-500 py-3 rounded-lg hover:bg-red-900 transition duration-300 flex items-center justify-center space-x-2 font-medium"
             >
               <span>Criar conta</span>
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

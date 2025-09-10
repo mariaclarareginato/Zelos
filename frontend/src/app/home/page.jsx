@@ -26,13 +26,15 @@ export default function Home() {
       </video>
  
    
-      <div className="absolute inset-0 bg-black/40" />
+
+      <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6">
+  <h1 className="text-2xl md:text-3xl font-bold text-gray-200 leading-snug max-w-2xl">
+    Logue com seu e-mail institucional. Se não tiver um, entre em contato com o administrador.
+    
+  </h1>
+
  
       {/* Botões */}
-
-      <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-gray-400">
-        <h1 className="text-3xl font-bold mb-20">Logue com seu e-mail institucional, se não tiver um entre em contato
-        </h1>
  
         <br />
  

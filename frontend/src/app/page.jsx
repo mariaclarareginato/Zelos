@@ -54,14 +54,14 @@ export default function Login() {
 // Formulário
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen bg-black">
       <div 
         className="absolute inset-0 bg-cover bg-center opacity-40 bg-no-repeat z-0"
       
       ></div>
 
       <div className="relative z-10 min-h-screen flex items-center justify-center py-12 px-4">
-        <div className="w-full max-w-md bg-gray/95 backdrop-blur-sm rounded-2xl shadow-xl p-8">
+        <div className="w-full max-w-md backdrop-blur-sm rounded-2xl shadow-xl p-8">
           <div className="mb-8">
             <br></br>
             <h1 className="text-3xl font-bold text-center text-red-700 mb-3">
@@ -69,7 +69,7 @@ export default function Login() {
             <br></br><br></br>
             </h1>
             
-            <p className="text-lg text-center text-gray-400">
+            <p className="text-lg text-center text-gray-500">
               Acesse sua conta para grenciar seus patrimônios e chamados<br />
               
             </p>
@@ -78,7 +78,7 @@ export default function Login() {
 
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label className="block text-sm font-medium text-gray-450 mb-1">
+              <label className="block text-sm font-medium text-gray-500 mb-1">
                 <br></br>
                 E-mail institucional
                 <br></br><br></br>
@@ -86,7 +86,7 @@ export default function Login() {
               <div className="relative">
                 <input
                   type="email"
-                  className="w-full px-4 py-3 border border-gray-450 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-450 text-center"
+                  className="w-full px-4 py-3 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-300 text-center"
                   placeholder="seu.email@dominio.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -109,14 +109,14 @@ export default function Login() {
 
               <br></br>
             <div>
-              <label className="block text-sm font-medium text-gray-450 mb-1">
+              <label className="block text-sm font-medium text-gray-500 mb-1">
                 Senha
                 <br></br><br></br>
               </label>
               <div className="relative">
                 <input
                   type={mostrarSenha ? "text" : "password"}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-450 text-center"
+                  className="w-full px-4 py-3 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-500 text-center"
                   placeholder="••••••••"
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
