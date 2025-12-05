@@ -150,6 +150,4 @@ O backend já está integrado com o AD. Autenticação de usuário é feita via 
 
 Este endpoint só funciona via rede cabeada ou wifi B07. Caso precise implementar funcionalidades no endpoint de autenticação, evite remover ou alterar o código existente. Caso o faça, teste e valide.
 
-## Licença
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
